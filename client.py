@@ -23,7 +23,7 @@ blue = (50, 80, 180)
 light_blue = (10, 20, 240)
 light_yellow = (255, 255, 0)
 yellow = (180, 180, 0)
-gray = (50, 50, 50)
+gray = (40, 40, 40)
 
 screen = pygame.display.set_mode((screen_w, screen_h))
 
@@ -39,8 +39,8 @@ pygame.display.set_caption("SQL project")
 # background_img = pygame.image.load("background_leve1.png")
 
 class button:
-    def __init__(self, surface, text, x, y, width, height, name, text_size=30, active_color=light_purple,
-                 inactive_color=purple, text_color=black):
+    def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple,
+                 inactive_color=purple, text_color=black, text_size=35):
         self.screen = surface
         self.text = text
         self.x = x
@@ -96,10 +96,16 @@ class button:
 
 # buttons
 center_x = screen_w / 2
-chart_button = button(screen, "full chart", center_x - 200 - 50, 400, 120, 70, "chart", 30, light_green, green)
-queries_button = button(screen, "queries", center_x + 200 - 50, 400, 120, 70, "queries", 30, light_green, green)
-back_button = button(screen, "back", 8, 8, 100, 50, "back", 30, light_yellow, yellow)
-exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", 30, light_red, red)
+chart_button = button(screen, "full chart", center_x - 200 - 50, 400, 120, 70, "chart", light_green, green)
+queries_button = button(screen, "queries", center_x + 200 - 50, 400, 120, 70, "queries", light_green, green)
+back_button = button(screen, "back", 8, 8, 100, 50, "back", light_yellow, yellow)
+exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", light_red, red)
+
+query1 = button(screen, "query1",screen_w/6 * 1 - 50, 200, 100, 50, "query1", light_purple, purple)
+query2 = button(screen, "query2",screen_w/6 * 2-50, 200, 100, 50, "query2", light_purple, purple)
+query3 = button(screen, "query3",screen_w/6 * 3-50, 200, 100, 50, "query3", light_purple, purple)
+query4 = button(screen, "query4",screen_w/6 * 4-50, 200, 100, 50, "query4", light_purple, purple)
+query5 = button(screen, "query5",screen_w/6 * 5-50, 200, 100, 50, "query5", light_purple, purple)
 
 
 def blur_img(img, amount):
@@ -159,6 +165,12 @@ def queries():
 
         # buttons
         back_button.draw()
+        exit_button.draw()
+        query1.draw()
+        query2.draw()
+        query3.draw()
+        query4.draw()
+        query5.draw()
 
         pygame.display.update()
         clock.tick(fps)
