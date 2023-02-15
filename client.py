@@ -19,11 +19,15 @@ red = (180, 50, 50)
 light_red = (220, 0, 0)
 green = (0, 120, 100)
 light_green = (0, 200, 100)
-blue = (50, 80, 180)
-light_blue = (10, 20, 240)
+blue = (60, 170 ,200)
+light_blue = (36, 100 ,113)
 light_yellow = (255, 255, 0)
 yellow = (180, 180, 0)
 gray = (40, 40, 40)
+light_pink = (255, 190, 203)
+pink = (255, 100, 147)
+
+background_img = "background2.jpg"
 
 screen = pygame.display.set_mode((screen_w, screen_h))
 
@@ -96,16 +100,24 @@ class button:
 
 # buttons
 center_x = screen_w / 2
-chart_button = button(screen, "full chart", center_x - 200 - 50, 400, 120, 70, "chart", light_green, green)
-queries_button = button(screen, "queries", center_x + 200 - 50, 400, 120, 70, "queries", light_green, green)
-back_button = button(screen, "back", 8, 8, 100, 50, "back", light_yellow, yellow)
-exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", light_red, red)
+chart_button = button(screen, "full chart", center_x - 200 - 50, 400, 120, 70, "chart", blue, light_blue)
+queries_button = button(screen, "queries", center_x + 200 - 50, 400, 120, 70, "queries", blue, light_blue)
+back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
+exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
 
-query1 = button(screen, "query1",screen_w/6 * 1 - 50, 200, 100, 50, "query1", light_purple, purple)
-query2 = button(screen, "query2",screen_w/6 * 2-50, 200, 100, 50, "query2", light_purple, purple)
-query3 = button(screen, "query3",screen_w/6 * 3-50, 200, 100, 50, "query3", light_purple, purple)
-query4 = button(screen, "query4",screen_w/6 * 4-50, 200, 100, 50, "query4", light_purple, purple)
-query5 = button(screen, "query5",screen_w/6 * 5-50, 200, 100, 50, "query5", light_purple, purple)
+query1 = button(screen, "query 1", screen_w / 6 * 1 - 50, 150, 100, 50, "query1", light_green, green)
+query2 = button(screen, "query 2", screen_w / 6 * 2 - 50, 150, 100, 50, "query2", light_green, green)
+query3 = button(screen, "query 3", screen_w / 6 * 3 - 50, 150, 100, 50, "query3", light_green, green)
+query4 = button(screen, "query 4", screen_w / 6 * 4 - 50, 150, 100, 50, "query4", light_green, green)
+query5 = button(screen, "query 5", screen_w / 6 * 5 - 50, 150, 100, 50, "query5", light_green, green)
+
+query6 = button(screen, "query 6", screen_w / 6 * 1 - 50, 350, 100, 50, "query6", light_green, green)
+query7 = button(screen, "query 7", screen_w / 6 * 2 - 50, 350, 100, 50, "query7", light_green, green)
+query8 = button(screen, "query 8", screen_w / 6 * 3 - 50, 350, 100, 50, "query8", light_green, green)
+query9 = button(screen, "query 9", screen_w / 6 * 4 - 50, 350, 100, 50, "query9", light_green, green)
+query10 = button(screen, "query 10", screen_w / 6 * 5 - 50, 350, 100, 50, "query10", light_green, green)
+
+send = button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", black, gray, text_color=(255, 255, 255))
 
 
 def blur_img(img, amount):
@@ -130,9 +142,9 @@ def start_screen():
                 quit()
 
         # background
-        into_background_img = pygame.image.load("background_intro.jpg")
+        into_background_img = pygame.image.load(background_img)
         img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
-        img = blur_img(img, 100)
+        # img = blur_img(img, 100)
         screen.blit(img, (0, 0))
 
         # text
@@ -162,6 +174,10 @@ def queries():
 
         # background
         screen.fill((0, 0, 0))
+        into_background_img = pygame.image.load(background_img)
+        img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
+        # img = blur_img(img, 100)
+        screen.blit(img, (0, 0))
 
         # buttons
         back_button.draw()
@@ -171,6 +187,12 @@ def queries():
         query3.draw()
         query4.draw()
         query5.draw()
+        query6.draw()
+        query7.draw()
+        query8.draw()
+        query9.draw()
+        query10.draw()
+        send.draw()
 
         pygame.display.update()
         clock.tick(fps)
@@ -218,9 +240,9 @@ def chart():
                 quit()
 
         # background
-        into_background_img = pygame.image.load("background_intro.jpg")
+        into_background_img = pygame.image.load(background_img)
         img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
-        img = blur_img(img, 100)
+        # img = blur_img(img, 100)
         screen.blit(img, (0, 0))
 
         # chart
