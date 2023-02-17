@@ -6,6 +6,10 @@ pygame.init()
 pygame.font.init()
 fonts = pygame.font.get_fonts()
 
+# icon
+icon = pygame.image.load('sql_icon.png')
+pygame.display.set_icon(icon)
+
 fps = 30
 screen_w = 1000
 screen_h = 600
@@ -19,13 +23,16 @@ red = (180, 50, 50)
 light_red = (220, 0, 0)
 green = (0, 120, 100)
 light_green = (0, 200, 100)
-blue = (60, 170 ,200)
-light_blue = (36, 100 ,113)
+blue = (60, 170, 200)
+light_blue = (36, 100, 113)
 light_yellow = (255, 255, 0)
 yellow = (180, 180, 0)
 gray = (40, 40, 40)
 light_pink = (255, 190, 203)
 pink = (255, 100, 147)
+white = (255, 255, 255)
+
+text_color = black
 
 background_img = "background2.jpg"
 
@@ -77,6 +84,13 @@ class button:
         if self.name == "exit":
             pygame.quit()
             quit()
+        if self.name == "send":
+            print("sending")
+        if self.name == "dont":
+            global welcome_text, background_img,text_color
+            welcome_text = "obviously..."
+            background_img = "hell.jpg"
+            text_color = white
 
     def is_clicked(self):
         click = self.clicked
@@ -100,8 +114,8 @@ class button:
 
 # buttons
 center_x = screen_w / 2
-chart_button = button(screen, "full chart", center_x - 200 - 50, 400, 120, 70, "chart", blue, light_blue)
-queries_button = button(screen, "queries", center_x + 200 - 50, 400, 120, 70, "queries", blue, light_blue)
+chart_button = button(screen, "full chart", center_x - 250 - 50, 400, 120, 70, "chart", blue, light_blue)
+queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "queries", blue, light_blue)
 back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
 exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
 
@@ -119,6 +133,8 @@ query10 = button(screen, "query 10", screen_w / 6 * 5 - 50, 350, 100, 50, "query
 
 send = button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", black, gray, text_color=(255, 255, 255))
 
+dont_button = button(screen, "DO NOT CLICK!", screen_w / 2 - 50, 400, 120, 70, "dont", blue, light_blue, text_size=21)
+
 
 def blur_img(img, amount):
     scale = 1 / float(amount)
@@ -131,9 +147,11 @@ def blur_img(img, amount):
 
 run = True
 
+welcome_text = "Welcome!"
+
 
 def start_screen():
-    global run
+    global run, welcome_text
     run = True
     while run:
         for event in pygame.event.get():
@@ -142,22 +160,22 @@ def start_screen():
                 quit()
 
         # background
-        into_background_img = pygame.image.load(background_img)
-        img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
-        # img = blur_img(img, 100)
+        intro_background_img = pygame.image.load(background_img)
+        img = pygame.transform.scale(intro_background_img, (screen_w, screen_h))
         screen.blit(img, (0, 0))
 
         # text
-        text1 = "Welcome!"
-        text1 = big_font.render(text1, True, black)
-        rect1 = text1.get_rect()
+        txt = welcome_text
+        txt = big_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6)
-        screen.blit(text1, rect1.topleft)
+        screen.blit(txt, rect1.topleft)
 
         # buttons
         chart_button.draw()
         queries_button.draw()
         exit_button.draw()
+        dont_button.draw()
 
         pygame.display.update()
         clock.tick(fps)
@@ -199,8 +217,9 @@ def queries():
 
 
 # example for a table
-mat = [["alon", "suissa", "100"], ["aviv", "turgeman", "200"], ["noam", "levi", "300"]]
-titles = ["first name", "last name", "salary"]
+mat = [["alon", "suissa", "100"], ["aviv", "turgeman", "200"], ["noam", "levi", "300"], ["noam", "levi", "300"],
+       ["noam", "levi", "300"], ["noam", "levi", "300"], ["noam", "levi", "300"], ["noam", "levi", "300"]]
+titles = ["FIRST NAME", "LAST NAME", "SALARY"]
 
 
 def print_table(matrix, y_title):
@@ -209,12 +228,12 @@ def print_table(matrix, y_title):
 
     # lines
     for i in range(1, len(matrix[0])):
-        pygame.draw.line(screen, black, (chunk_x * i, 60), (chunk_x * i, chunk_y * (len(matrix) + 2)))
+        pygame.draw.line(screen, text_color, (chunk_x * i, 60), (chunk_x * i, chunk_y * (len(matrix) + 2)))
     for i in range(2, len(matrix) + 2):
-        pygame.draw.line(screen, black, (0, chunk_y * i), (chunk_x * (len(matrix[0])), chunk_y * i))
+        pygame.draw.line(screen, text_color, (0, chunk_y * i), (chunk_x * (len(matrix[0])), chunk_y * i))
 
     # titles
-    title_font = pygame.font.Font('freesansbold.ttf', 18)
+    title_font = pygame.font.Font('freesansbold.ttf', 15)
     for i in range(0, len(titles)):
         text = title_font.render(titles[i], True, gray)
         rect = text.get_rect()
@@ -224,7 +243,7 @@ def print_table(matrix, y_title):
     # values
     for i in range(len(matrix)):
         for j in range(len(matrix[i])):
-            text = chart_font.render(matrix[i][j], True, black)
+            text = chart_font.render(matrix[i][j], True, text_color)
             rect = text.get_rect()
             rect.center = (int(chunk_x * (j + 0.5)), int(chunk_y * (i + 1.5) + 60))
             screen.blit(text, rect.topleft)
