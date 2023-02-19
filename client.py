@@ -51,7 +51,7 @@ pygame.display.set_caption("SQL project")
 
 class button:
     def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple,
-                 inactive_color=purple, text_color=black, text_size=35):
+                 inactive_color=purple, text_color=black, text_size=35, visible=True):
         self.screen = surface
         self.text = text
         self.x = x
@@ -64,6 +64,7 @@ class button:
         self.text_color = text_color
         self.clicked = False
         self.name = name
+        self.visible = visible
 
     def text_to_button(self):
         text = self.font.render(self.text, True, self.text_color)
@@ -87,10 +88,11 @@ class button:
         if self.name == "send":
             print("sending")
         if self.name == "dont":
-            global welcome_text, background_img,text_color
+            global welcome_text, background_img, text_color
             welcome_text = "obviously..."
             background_img = "hell.jpg"
             text_color = white
+            self.visible = False
 
     def is_clicked(self):
         click = self.clicked
@@ -98,18 +100,19 @@ class button:
         return click
 
     def draw(self):
-        cur = pygame.mouse.get_pos()
-        if (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height):
-            if pygame.mouse.get_pressed()[0] == 1:
-                if not self.clicked:
-                    self.click()
-                    self.clicked = True
+        if self.visible:
+            cur = pygame.mouse.get_pos()
+            if (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height):
+                if pygame.mouse.get_pressed()[0] == 1:
+                    if not self.clicked:
+                        self.click()
+                        self.clicked = True
+                else:
+                    self.clicked = False
+                pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
             else:
-                self.clicked = False
-            pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
-        else:
-            pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
-        self.text_to_button()
+                pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
+            self.text_to_button()
 
 
 # buttons
@@ -217,13 +220,15 @@ def queries():
 
 
 # example for a table
-mat = [["alon", "suissa", "100"], ["aviv", "turgeman", "200"], ["noam", "levi", "300"], ["noam", "levi", "300"],
-       ["noam", "levi", "300"], ["noam", "levi", "300"], ["noam", "levi", "300"], ["noam", "levi", "300"]]
-titles = ["FIRST NAME", "LAST NAME", "SALARY"]
+mat = [["Erling Haaland", "22", "MCFC", "CF", "26", "4"],
+       ["Harry Kane", "29", "Spurs", "CF", "17", "2"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Bukayo Saka", "21", "Arsenal", "RF", "9", "8"]]
+titles = ["name","age", "Team", "position", "goals", "assissts"]
 
 
 def print_table(matrix, y_title):
-    chunk_x = screen_w / 10
+    chunk_x = screen_w / 6
     chunk_y = screen_h / 10
 
     # lines
@@ -233,7 +238,7 @@ def print_table(matrix, y_title):
         pygame.draw.line(screen, text_color, (0, chunk_y * i), (chunk_x * (len(matrix[0])), chunk_y * i))
 
     # titles
-    title_font = pygame.font.Font('freesansbold.ttf', 15)
+    title_font = pygame.font.Font('freesansbold.ttf', 20)
     for i in range(0, len(titles)):
         text = title_font.render(titles[i], True, gray)
         rect = text.get_rect()
