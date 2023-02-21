@@ -39,8 +39,9 @@ background_img = "background2.jpg"
 screen = pygame.display.set_mode((screen_w, screen_h))
 
 big_font = pygame.font.Font('freesansbold.ttf', 100)
-med_font = pygame.font.Font('freesansbold.ttf', 50)
-small_font = pygame.font.Font('freesansbold.ttf', 20)
+med_font = pygame.font.Font('freesansbold.ttf', 60)
+small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
+extra_small_font = pygame.font.Font('freesansbold.ttf', 20)
 
 chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 20)
 
@@ -65,6 +66,7 @@ class button:
         self.clicked = False
         self.name = name
         self.visible = visible
+        self.click_on_index = 0
 
     def text_to_button(self):
         text = self.font.render(self.text, True, self.text_color)
@@ -78,7 +80,7 @@ class button:
             chart()
             run = True
         if self.name == "queries":
-            queries()
+            queries_categories()
             run = True
         if self.name == "back":
             run = False
@@ -107,12 +109,143 @@ class button:
                     if not self.clicked:
                         self.click()
                         self.clicked = True
+                        self.click_on_index = (self.click_on_index + 1) % 2
                 else:
                     self.clicked = False
                 pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
             else:
                 pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
             self.text_to_button()
+
+
+class and_or_buttons(button):
+
+    def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple, inactive_color=purple,
+                 text_color=black, text_size=35, visible=True):
+        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
+                         visible)
+
+    def text_to_button(self):
+        super().text_to_button()
+
+    def click(self):
+        super().click()
+
+
+class category_button(button):
+
+    def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple, inactive_color=purple,
+                 text_color=black, text_size=35, visible=True):
+        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
+                         visible)
+
+    def click(self):
+        global run
+        if self.name == "Goals":
+            goals_queries()
+            run = True
+        if self.name == "Assists":
+            print("Assists")
+        if self.name == "Team":
+            print("Team")
+        if self.name == "Age":
+            print("Age")
+        if self.name == "Number":
+            print("Number")
+        if self.name == "Position":
+            print("Position")
+
+
+def goals_queries():
+    global run
+    run = True
+    gaol_q1 = query_button(screen,"query 1",screen_w/2,screen_h/2,100,50,"query1",1)
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+
+        # background
+        intro_background_img = pygame.image.load(background_img)
+        img = pygame.transform.scale(intro_background_img, (screen_w, screen_h))
+        screen.blit(img, (0, 0))
+
+        # text
+        txt = "Choose Your Query"
+        txt = med_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
+        # buttons
+        gaol_q1.draw()
+        exit_button.draw()
+        back_button.draw()
+
+        pygame.display.update()
+        clock.tick(fps)
+
+
+class query_button(button):
+
+    def __init__(self, surface, text, x, y, width, height, name, index, active_color=light_purple,
+                 inactive_color=purple,
+                 text_color=black, text_size=35, visible=True):
+        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
+                         visible)
+        self.index = index
+
+    def query(self):
+        return self.index
+
+    def draw(self):
+        conditions = [False, True]
+        click_on = conditions[self.click_on_index]
+        if self.visible:
+            cur = pygame.mouse.get_pos()
+            if (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height):
+                # hover text:
+                # text = "lncakjkasbcksabcskb"
+                # text = small_font.render(text, True, gray)
+                # rect = text.get_rect()
+                # rect.center = (self.x + self.width/2 , self.y + self.height + 10)
+                # self.screen.blit(text, rect.topleft)
+                if pygame.mouse.get_pressed()[0] == 1:
+                    if not self.clicked:
+                        self.click()
+                        self.clicked = True
+                        self.click_on_index = (self.click_on_index + 1) % 2
+                        click_on = conditions[self.click_on_index]
+                else:
+                    self.clicked = False
+                pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
+            else:
+                pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
+            if click_on:
+                pygame.draw.rect(self.screen, black,
+                                 (self.x - 3, self.y - 3, self.width + 6, self.height + 6), 3)
+            self.text_to_button()
+
+
+class send_button(button):
+
+    def __init__(self, surface, text, x, y, width, height, name, queries: list[query_button], active_color=light_purple,
+                 inactive_color=purple,
+                 text_color=black, text_size=35, visible=True):
+        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
+                         visible)
+        self.queries = queries
+
+    def click(self):
+        queries_to_send = []
+        for query in self.queries:
+            # if the button is clicked right now
+            if query.click_on_index == 1:
+                # add that query to the sending query
+                queries_to_send.insert(0, query.query())
+
+        print("sending: ", queries_to_send)
 
 
 # buttons
@@ -122,19 +255,26 @@ queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "q
 back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
 exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
 
-query1 = button(screen, "query 1", screen_w / 6 * 1 - 50, 150, 100, 50, "query1", light_green, green)
-query2 = button(screen, "query 2", screen_w / 6 * 2 - 50, 150, 100, 50, "query2", light_green, green)
-query3 = button(screen, "query 3", screen_w / 6 * 3 - 50, 150, 100, 50, "query3", light_green, green)
-query4 = button(screen, "query 4", screen_w / 6 * 4 - 50, 150, 100, 50, "query4", light_green, green)
-query5 = button(screen, "query 5", screen_w / 6 * 5 - 50, 150, 100, 50, "query5", light_green, green)
+button_w = 150
+button_h = 75
 
-query6 = button(screen, "query 6", screen_w / 6 * 1 - 50, 350, 100, 50, "query6", light_green, green)
-query7 = button(screen, "query 7", screen_w / 6 * 2 - 50, 350, 100, 50, "query7", light_green, green)
-query8 = button(screen, "query 8", screen_w / 6 * 3 - 50, 350, 100, 50, "query8", light_green, green)
-query9 = button(screen, "query 9", screen_w / 6 * 4 - 50, 350, 100, 50, "query9", light_green, green)
-query10 = button(screen, "query 10", screen_w / 6 * 5 - 50, 350, 100, 50, "query10", light_green, green)
+category1_Goals = category_button(screen, "Goals", screen_w / 2 - button_w / 2, 250,
+                                  button_w, button_h, "Goals", light_green, green)
+category2_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
+                                    button_w, button_h, "Assists", light_green, green)
+category3_Teams = category_button(screen, "Team", screen_w / 2 - button_w / 2 - 200, 250,
+                                  button_w, button_h, "Team", light_green, green)
 
-send = button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", black, gray, text_color=(255, 255, 255))
+category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 + 200, 375,
+                                button_w, button_h, "Age", light_green, green)
+category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
+                                   button_w, button_h, "Number", light_green, green)
+category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 - 200, 375,
+                                     button_w, button_h, "Position", light_green, green)
+
+queries = []
+send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries, black, gray,
+                   text_color=(255, 255, 255))
 
 dont_button = button(screen, "DO NOT CLICK!", screen_w / 2 - 50, 400, 120, 70, "dont", blue, light_blue, text_size=21)
 
@@ -150,7 +290,9 @@ def blur_img(img, amount):
 
 run = True
 
-welcome_text = "Welcome!"
+welcome_text = "Premier League Players SQL"
+aviv = "Aviv Turgeman - 208007351"
+alon = "Alon Suissa - 211344015"
 
 
 def start_screen():
@@ -169,9 +311,21 @@ def start_screen():
 
         # text
         txt = welcome_text
-        txt = big_font.render(txt, True, text_color)
+        txt = med_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
+        txt = aviv
+        txt = small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6 + 100)
+        screen.blit(txt, rect1.topleft)
+
+        txt = alon
+        txt = small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6 + 200)
         screen.blit(txt, rect1.topleft)
 
         # buttons
@@ -184,7 +338,7 @@ def start_screen():
         clock.tick(fps)
 
 
-def queries():
+def queries_categories():
     global run
     run = True
     while run:
@@ -200,20 +354,23 @@ def queries():
         # img = blur_img(img, 100)
         screen.blit(img, (0, 0))
 
+        # text
+        txt = "Choose A Query Category"
+        cur_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 70)
+        txt = cur_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
         # buttons
         back_button.draw()
         exit_button.draw()
-        query1.draw()
-        query2.draw()
-        query3.draw()
-        query4.draw()
-        query5.draw()
-        query6.draw()
-        query7.draw()
-        query8.draw()
-        query9.draw()
-        query10.draw()
-        send.draw()
+        category1_Goals.draw()
+        category2_Assists.draw()
+        category3_Teams.draw()
+        category4_Age.draw()
+        category5_Number.draw()
+        category6_Position.draw()
 
         pygame.display.update()
         clock.tick(fps)
@@ -224,25 +381,32 @@ mat = [["Erling Haaland", "22", "MCFC", "CF", "26", "4"],
        ["Harry Kane", "29", "Spurs", "CF", "17", "2"],
        ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
        ["Bukayo Saka", "21", "Arsenal", "RF", "9", "8"]]
-titles = ["name","age", "Team", "position", "goals", "assissts"]
+titles = ["name", "age", "Team", "position", "goals", "assissts"]
 
 
-def print_table(matrix, y_title):
+def print_table(matrix, delta_y):
     chunk_x = screen_w / 6
     chunk_y = screen_h / 10
 
+    # boundaries
+    if delta_y < 0 and (chunk_y * 2) - delta_y >= 120:
+        delta_y = 0
+
     # lines
-    for i in range(1, len(matrix[0])):
-        pygame.draw.line(screen, text_color, (chunk_x * i, 60), (chunk_x * i, chunk_y * (len(matrix) + 2)))
     for i in range(2, len(matrix) + 2):
-        pygame.draw.line(screen, text_color, (0, chunk_y * i), (chunk_x * (len(matrix[0])), chunk_y * i))
+        pygame.draw.line(screen, text_color, (0, (chunk_y * i) - delta_y),
+                         (chunk_x * (len(matrix[0])), (chunk_y * i) - delta_y))
+
+    for i in range(1, len(matrix[0])):
+        pygame.draw.line(screen, text_color, (chunk_x * i, 60 - delta_y),
+                         (chunk_x * i, chunk_y * (len(matrix) + 2) - delta_y))
 
     # titles
     title_font = pygame.font.Font('freesansbold.ttf', 20)
     for i in range(0, len(titles)):
         text = title_font.render(titles[i], True, gray)
         rect = text.get_rect()
-        rect.center = (int(chunk_x * (0.5 + i)), int(60 + chunk_y / 2))
+        rect.center = (int(chunk_x * (0.5 + i)), int(60 + chunk_y / 2) - delta_y)
         screen.blit(text, rect.topleft)
 
     # values
@@ -250,19 +414,45 @@ def print_table(matrix, y_title):
         for j in range(len(matrix[i])):
             text = chart_font.render(matrix[i][j], True, text_color)
             rect = text.get_rect()
-            rect.center = (int(chunk_x * (j + 0.5)), int(chunk_y * (i + 1.5) + 60))
+            rect.center = (int(chunk_x * (j + 0.5)), int(chunk_y * (i + 1.5) + 60) - delta_y)
             screen.blit(text, rect.topleft)
+    return delta_y
 
 
 def chart():
     global run
     run = True
+    delta_y = 0
+    scroll_speed = 10
+    down = False
+    up = False
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
 
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    up = True
+                if event.key == pygame.K_DOWN:
+                    down = True
+                if event.key == pygame.K_RIGHT:
+                    scroll_speed += 2
+                if event.key == pygame.K_LEFT:
+                    scroll_speed -= 2
+            if event.type == pygame.KEYUP:
+                if event.key == pygame.K_DOWN:
+                    down = False
+                if event.key == pygame.K_UP:
+                    up = False
+            if scroll_speed <= 0:
+                scroll_speed = 1
+
+        if down:
+            delta_y -= scroll_speed
+        elif up:
+            delta_y += scroll_speed
         # background
         into_background_img = pygame.image.load(background_img)
         img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
@@ -270,7 +460,7 @@ def chart():
         screen.blit(img, (0, 0))
 
         # chart
-        print_table(mat, titles)
+        delta_y = print_table(mat, delta_y)
 
         # buttons
         back_button.draw()
