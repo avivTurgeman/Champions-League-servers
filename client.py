@@ -38,6 +38,12 @@ background_img = "background2.jpg"
 
 screen = pygame.display.set_mode((screen_w, screen_h))
 
+# universal text
+welcome_text = "Premier League Players SQL"
+aviv = "Aviv Turgeman - 208007351"
+alon = "Alon Suissa - 211344015"
+
+
 big_font = pygame.font.Font('freesansbold.ttf', 100)
 med_font = pygame.font.Font('freesansbold.ttf', 60)
 small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
@@ -89,6 +95,9 @@ class button:
             quit()
         if self.name == "send":
             print("sending")
+        if self.name == "query":
+            # TO-DO: change all the names of the queries to "query" (maybe send their index for distinquish)
+            pass
         if self.name == "dont":
             global welcome_text, background_img, text_color
             welcome_text = "obviously..."
@@ -285,10 +294,16 @@ def queries_draw(buttons: list[button]):
         screen.blit(img, (0, 0))
 
         # text
-        txt = "Choose Your Query"
+        txt = "Choose Your Queries"
         txt = med_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
+        txt = "if you choose more then one its with && operation between them"
+        txt = extra_small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6 + 70)
         screen.blit(txt, rect1.topleft)
 
         # buttons
@@ -363,56 +378,23 @@ class send_button(button):
         print("sending: ", queries_to_send)
 
 
-# buttons
+# universal buttons
 center_x = screen_w / 2
-chart_button = button(screen, "full chart", center_x - 250 - 50, 400, 120, 70, "chart", blue, light_blue)
-queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "queries", blue, light_blue)
 back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
 exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
 
-button_w = 150
-button_h = 75
-
-category1_Teams = category_button(screen, "Team", screen_w / 2 - button_w / 2 - 200, 250,
-                                  button_w, button_h, "Team", light_green, green)
-
-category2_Goals = category_button(screen, "Goals", screen_w / 2 - button_w / 2, 250,
-                                  button_w, button_h, "Goals", light_green, green)
-category3_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
-                                    button_w, button_h, "Assists", light_green, green)
-
-
-category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 - 200, 375,
-                                button_w, button_h, "Age", light_green, green)
-category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
-                                   button_w, button_h, "Number", light_green, green)
-category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 200, 375,
-                                     button_w, button_h, "Position", light_green, green)
-
-queries = []
-send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries, black, gray,
-                   text_color=(255, 255, 255))
-
-dont_button = button(screen, "DO NOT CLICK!", screen_w / 2 - 50, 400, 120, 70, "dont", blue, light_blue, text_size=21)
-
-
-def blur_img(img, amount):
-    scale = 1 / float(amount)
-    surf_size = img.get_size()
-    scale_size = (int(surf_size[0] * scale), int(surf_size[1] * scale))
-    surf = pygame.transform.smoothscale(img, scale_size)
-    surf = pygame.transform.smoothscale(surf, surf_size)
-    return surf
-
+# queries = []
+# send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries, black, gray,
+#                    text_color=(255, 255, 255))
 
 run = True
 
-welcome_text = "Premier League Players SQL"
-aviv = "Aviv Turgeman - 208007351"
-alon = "Alon Suissa - 211344015"
-
 
 def start_screen():
+    dont_button = button(screen, "DO NOT CLICK!", screen_w / 2 - 50, 400, 120, 70, "dont", blue, light_blue,
+                         text_size=21)
+    chart_button = button(screen, "full chart", center_x - 250 - 50, 400, 120, 70, "chart", blue, light_blue)
+    queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "queries", blue, light_blue)
     global run, welcome_text
     run = True
     while run:
@@ -456,6 +438,22 @@ def start_screen():
 
 
 def queries_categories():
+    button_w = 150
+    button_h = 75
+    category1_Teams = category_button(screen, "Team", screen_w / 2 - button_w / 2 - 200, 250,
+                                      button_w, button_h, "Team", light_green, green)
+
+    category2_Goals = category_button(screen, "Goals", screen_w / 2 - button_w / 2, 250,
+                                      button_w, button_h, "Goals", light_green, green)
+    category3_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
+                                        button_w, button_h, "Assists", light_green, green)
+
+    category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 - 200, 375,
+                                    button_w, button_h, "Age", light_green, green)
+    category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
+                                       button_w, button_h, "Number", light_green, green)
+    category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 200, 375,
+                                         button_w, button_h, "Position", light_green, green)
     global run
     run = True
     while run:
