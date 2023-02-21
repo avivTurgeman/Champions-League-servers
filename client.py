@@ -63,7 +63,7 @@ class button:
         self.active_color = active_color
         self.inactive_color = inactive_color
         self.text_color = text_color
-        self.clicked = False
+        self.clicked = True
         self.name = name
         self.visible = visible
         self.click_on_index = 0
@@ -141,25 +141,138 @@ class category_button(button):
 
     def click(self):
         global run
+        if self.name == "Team":
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 11", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query11", 21, light_green, green)
+            gaol_q2 = query_button(screen, "query 12", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query12", 12, light_green, green)
+            gaol_q3 = query_button(screen, "query 13", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query13", 13, light_green, green)
+            gaol_q4 = query_button(screen, "query 14", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query14", 14, light_green, green)
+            gaol_q5 = query_button(screen, "query 15", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query15", 15, light_green, green)
+            gaol_q6 = query_button(screen, "query 16", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query16", 16, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
+            run = True
         if self.name == "Goals":
-            goals_queries()
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 21", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query21", 21, light_green, green)
+            gaol_q2 = query_button(screen, "query 22", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query22", 22, light_green, green)
+            gaol_q3 = query_button(screen, "query 23", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query23", 23, light_green, green)
+            gaol_q4 = query_button(screen, "query 24", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query24", 24, light_green, green)
+            gaol_q5 = query_button(screen, "query 25", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query25", 25, light_green, green)
+            gaol_q6 = query_button(screen, "query 26", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query26", 26, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
             run = True
         if self.name == "Assists":
-            print("Assists")
-        if self.name == "Team":
-            print("Team")
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 31", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query31", 31, light_green, green)
+            gaol_q2 = query_button(screen, "query 32", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query32", 32, light_green, green)
+            gaol_q3 = query_button(screen, "query 33", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query33", 33, light_green, green)
+            gaol_q4 = query_button(screen, "query 34", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query34", 34, light_green, green)
+            gaol_q5 = query_button(screen, "query 35", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query35", 35, light_green, green)
+            gaol_q6 = query_button(screen, "query 36", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query36", 36, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
+            run = True
         if self.name == "Age":
-            print("Age")
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 41", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query41", 41, light_green, green)
+            gaol_q2 = query_button(screen, "query 42", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query42", 42, light_green, green)
+            gaol_q3 = query_button(screen, "query 43", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query43", 43, light_green, green)
+            gaol_q4 = query_button(screen, "query 44", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query44", 44, light_green, green)
+            gaol_q5 = query_button(screen, "query 45", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query45", 45, light_green, green)
+            gaol_q6 = query_button(screen, "query 26", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query46", 46, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
+            run = True
         if self.name == "Number":
-            print("Number")
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 51", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query51", 51, light_green, green)
+            gaol_q2 = query_button(screen, "query 52", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query52", 52, light_green, green)
+            gaol_q3 = query_button(screen, "query 53", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query53", 53, light_green, green)
+            gaol_q4 = query_button(screen, "query 54", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query54", 54, light_green, green)
+            gaol_q5 = query_button(screen, "query 55", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query55", 55, light_green, green)
+            gaol_q6 = query_button(screen, "query 56", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query56", 56, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
+            run = True
         if self.name == "Position":
-            print("Position")
+            button_w = 150
+            button_h = 75
+            gaol_q1 = query_button(screen, "query 61", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "query21", 61, light_green, green)
+            gaol_q2 = query_button(screen, "query 62", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "query62", 62, light_green, green)
+            gaol_q3 = query_button(screen, "query 63", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "query63", 63, light_green, green)
+            gaol_q4 = query_button(screen, "query 64", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "query64", 64, light_green, green)
+            gaol_q5 = query_button(screen, "query 65", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "query65", 65, light_green, green)
+            gaol_q6 = query_button(screen, "query 66", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "query66", 66, light_green, green)
+            queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
+            send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
+                               text_color=(255, 255, 255))
+            buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
+            queries_draw(buttons_list)
+            run = True
 
 
-def goals_queries():
+def queries_draw(buttons: list[button]):
     global run
     run = True
-    gaol_q1 = query_button(screen,"query 1",screen_w/2,screen_h/2,100,50,"query1",1)
+
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -179,7 +292,9 @@ def goals_queries():
         screen.blit(txt, rect1.topleft)
 
         # buttons
-        gaol_q1.draw()
+        for b in buttons:
+            b.draw()
+
         exit_button.draw()
         back_button.draw()
 
@@ -258,18 +373,20 @@ exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pin
 button_w = 150
 button_h = 75
 
-category1_Goals = category_button(screen, "Goals", screen_w / 2 - button_w / 2, 250,
-                                  button_w, button_h, "Goals", light_green, green)
-category2_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
-                                    button_w, button_h, "Assists", light_green, green)
-category3_Teams = category_button(screen, "Team", screen_w / 2 - button_w / 2 - 200, 250,
+category1_Teams = category_button(screen, "Team", screen_w / 2 - button_w / 2 - 200, 250,
                                   button_w, button_h, "Team", light_green, green)
 
-category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 + 200, 375,
+category2_Goals = category_button(screen, "Goals", screen_w / 2 - button_w / 2, 250,
+                                  button_w, button_h, "Goals", light_green, green)
+category3_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
+                                    button_w, button_h, "Assists", light_green, green)
+
+
+category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 - 200, 375,
                                 button_w, button_h, "Age", light_green, green)
 category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
                                    button_w, button_h, "Number", light_green, green)
-category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 - 200, 375,
+category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 200, 375,
                                      button_w, button_h, "Position", light_green, green)
 
 queries = []
@@ -365,9 +482,9 @@ def queries_categories():
         # buttons
         back_button.draw()
         exit_button.draw()
-        category1_Goals.draw()
-        category2_Assists.draw()
-        category3_Teams.draw()
+        category2_Goals.draw()
+        category3_Assists.draw()
+        category1_Teams.draw()
         category4_Age.draw()
         category5_Number.draw()
         category6_Position.draw()
