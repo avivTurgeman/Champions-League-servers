@@ -13,7 +13,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1,600.0)
+mixer.music.play(-1, 600.0)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -83,6 +83,10 @@ class button:
         text_rect.center = (self.x + (self.width / 2), self.y + (self.height / 2))
         self.screen.blit(text, text_rect.topleft)
 
+    def is_hover(self):
+        cur = pygame.mouse.get_pos()
+        return (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height)
+
     def click(self):
         click_sound.play()
         global run
@@ -116,8 +120,8 @@ class button:
 
     def draw(self):
         if self.visible:
-            cur = pygame.mouse.get_pos()
-            if (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height):
+            if self.is_hover():
+                pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
                 if pygame.mouse.get_pressed()[0] == 1:
                     if not self.clicked:
                         self.click()
@@ -288,6 +292,7 @@ def queries_draw(buttons: list[button]):
     run = True
 
     while run:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -312,8 +317,14 @@ def queries_draw(buttons: list[button]):
         screen.blit(txt, rect1.topleft)
 
         # buttons
+        hover = False
         for b in buttons:
             b.draw()
+            hover = hover or b.is_hover()
+        if hover:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
 
         exit_button.draw()
         back_button.draw()
@@ -434,6 +445,7 @@ def start_screen():
         screen.blit(txt, rect1.topleft)
 
         # buttons
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         chart_button.draw()
         queries_button.draw()
         exit_button.draw()
@@ -484,6 +496,7 @@ def queries_categories():
         screen.blit(txt, rect1.topleft)
 
         # buttons
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         back_button.draw()
         exit_button.draw()
         category2_Goals.draw()
@@ -505,12 +518,12 @@ mat = [["Erling Haaland", "22", "MCFC", "CF", "26", "4"],
        ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
        ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
        ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"]]
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"]]
 titles = ["name", "age", "Team", "position", "goals", "assists"]
 
 
@@ -596,6 +609,7 @@ def chart():
         delta_y = print_table(mat, delta_y)
 
         # buttons
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         back_button.draw()
         exit_button.draw()
 
