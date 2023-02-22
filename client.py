@@ -25,8 +25,6 @@ green = (0, 120, 100)
 light_green = (0, 200, 100)
 blue = (60, 170, 200)
 light_blue = (36, 100, 113)
-light_yellow = (255, 255, 0)
-yellow = (180, 180, 0)
 gray = (40, 40, 40)
 light_pink = (255, 190, 203)
 pink = (255, 100, 147)
@@ -42,7 +40,6 @@ screen = pygame.display.set_mode((screen_w, screen_h))
 welcome_text = "Premier League Players SQL"
 aviv = "Aviv Turgeman - 208007351"
 alon = "Alon Suissa - 211344015"
-
 
 big_font = pygame.font.Font('freesansbold.ttf', 100)
 med_font = pygame.font.Font('freesansbold.ttf', 60)
@@ -495,8 +492,17 @@ def queries_categories():
 mat = [["Erling Haaland", "22", "MCFC", "CF", "26", "4"],
        ["Harry Kane", "29", "Spurs", "CF", "17", "2"],
        ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Bukayo Saka", "21", "Arsenal", "RF", "9", "8"]]
-titles = ["name", "age", "Team", "position", "goals", "assissts"]
+       ["Bukayo Saka", "21", "Arsenal", "RF", "9", "8"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
+       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],["Ivan Toney", "26", "Brentford", "CF", "14", "3"]]
+titles = ["name", "age", "Team", "position", "goals", "assists"]
 
 
 def print_table(matrix, delta_y):
@@ -504,8 +510,11 @@ def print_table(matrix, delta_y):
     chunk_y = screen_h / 10
 
     # boundaries
-    if delta_y < 0 and (chunk_y * 2) - delta_y >= 120:
+    down_boundary = 570
+    if delta_y < 0 and ((chunk_y * 2) - delta_y >= 120):
         delta_y = 0
+    elif delta_y > 0 and (chunk_y * (len(matrix) + 2) - delta_y) < down_boundary:
+        delta_y = chunk_y * (len(matrix) + 2) - down_boundary
 
     # lines
     for i in range(2, len(matrix) + 2):
