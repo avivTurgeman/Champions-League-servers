@@ -1,4 +1,5 @@
 import pygame
+from pygame import mixer
 
 # import button
 
@@ -9,6 +10,11 @@ fonts = pygame.font.get_fonts()
 # icon
 icon = pygame.image.load('sql_icon.png')
 pygame.display.set_icon(icon)
+
+# sound
+mixer.music.load('background_Sound.mp3')
+mixer.music.play(-1,600.0)
+click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
 screen_w = 1000
@@ -78,6 +84,7 @@ class button:
         self.screen.blit(text, text_rect.topleft)
 
     def click(self):
+        click_sound.play()
         global run
         if self.name == "chart":
             chart()
@@ -146,6 +153,7 @@ class category_button(button):
                          visible)
 
     def click(self):
+        click_sound.play()
         global run
         if self.name == "Team":
             button_w = 150
@@ -365,6 +373,7 @@ class send_button(button):
         self.queries = queries
 
     def click(self):
+        click_sound.play()
         queries_to_send = []
         for query in self.queries:
             # if the button is clicked right now
