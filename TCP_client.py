@@ -1,11 +1,33 @@
 import pygame
 from pygame import mixer
+import socket
+import pickle
+from PL_player import PL_player
+import query_object
 
-# import button
+# defines
+HEADERSIZE = 16
+PORT = 5056
+FORMAT = 'utf-8'  # the format that the messages decode/encode
+DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
+SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+ADDR = (SERVER, PORT)
 
+# socket
+try:
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client.connect(ADDR)
+except ConnectionRefusedError as error:
+    print("U SHOULD RUN THE SERVER FIRST")
+    print(error)
+else:
+    print("Connection established")
 pygame.init()
 pygame.font.init()
 fonts = pygame.font.get_fonts()
+
+
+titles = ["name", "age", "Team", "position", "goals", "assists"]
 
 # icon
 icon = pygame.image.load('sql_icon.png')
@@ -13,7 +35,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1, 600.0)
+mixer.music.play(-1, 754.0)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -49,7 +71,8 @@ alon = "Alon Suissa - 211344015"
 
 big_font = pygame.font.Font('freesansbold.ttf', 100)
 med_font = pygame.font.Font('freesansbold.ttf', 60)
-small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
+special_small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
+regular_small_font = pygame.font.Font('freesansbold.ttf', 30)
 extra_small_font = pygame.font.Font('freesansbold.ttf', 20)
 
 chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 20)
@@ -91,7 +114,8 @@ class button:
         click_sound.play()
         global run
         if self.name == "chart":
-            chart()
+            full_q = [query_object.query_obj("full")]
+            send(full_q)
             run = True
         if self.name == "queries":
             queries_categories()
@@ -99,13 +123,7 @@ class button:
         if self.name == "back":
             run = False
         if self.name == "exit":
-            pygame.quit()
-            quit()
-        if self.name == "send":
-            print("sending")
-        if self.name == "query":
-            # TO-DO: change all the names of the queries to "query" (maybe send their index for distinquish)
-            pass
+            _quit()
         if self.name == "dont":
             global welcome_text, background_img, text_color
             welcome_text = "obviously..."
@@ -132,6 +150,38 @@ class button:
                 pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
             else:
                 pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
+            self.text_to_button()
+
+
+class explain_button(button):
+
+    def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple, inactive_color=purple,
+                 text_color=black, text_size=35, visible=True):
+        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
+                         visible)
+
+    def click(self):
+        pass
+
+    def draw(self):
+        if self.visible:
+            if self.is_hover():
+                text1 = "Use UP/DOWN for scrolling"
+                text2 = "Use RIGHT/LEFT for controlling the scroll speed"
+                text1 = regular_small_font.render(text1, True, black)
+                text2 = regular_small_font.render(text2, True, black)
+                text1_rect = text1.get_rect()
+                text1_rect.center = (center_x, screen_h / 2)
+
+                text2_rect = text2.get_rect()
+                text2_rect.center = (center_x, screen_h / 2 + 100)
+
+                pygame.draw.rect(screen, green, (text2_rect.x - 10, text1_rect.y - 10, text2_rect.width + 20,
+                                                 (text2_rect.y - text1_rect.y) + text2_rect.height + 20))
+                self.screen.blit(text1, text1_rect.topleft)
+                self.screen.blit(text2, text2_rect.topleft)
+
+            pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
             self.text_to_button()
 
 
@@ -162,13 +212,13 @@ class category_button(button):
         if self.name == "Team":
             button_w = 150
             button_h = 75
-            gaol_q1 = query_button(screen, "query 11", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+            gaol_q1 = query_button(screen, "Spurs", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
                                    "query11", 21, light_green, green)
-            gaol_q2 = query_button(screen, "query 12", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+            gaol_q2 = query_button(screen, "MCFC", screen_w / 2 - button_w / 2, 250, button_w, button_h,
                                    "query12", 12, light_green, green)
-            gaol_q3 = query_button(screen, "query 13", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+            gaol_q3 = query_button(screen, "Brentford", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
                                    "query13", 13, light_green, green)
-            gaol_q4 = query_button(screen, "query 14", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+            gaol_q4 = query_button(screen, "Arsenal", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
                                    "query14", 14, light_green, green)
             gaol_q5 = query_button(screen, "query 15", screen_w / 2 - button_w / 2, 375, button_w, button_h,
                                    "query15", 15, light_green, green)
@@ -287,52 +337,6 @@ class category_button(button):
             run = True
 
 
-def queries_draw(buttons: list[button]):
-    global run
-    run = True
-
-    while run:
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-
-        # background
-        intro_background_img = pygame.image.load(background_img)
-        img = pygame.transform.scale(intro_background_img, (screen_w, screen_h))
-        screen.blit(img, (0, 0))
-
-        # text
-        txt = "Choose Your Queries"
-        txt = med_font.render(txt, True, text_color)
-        rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6)
-        screen.blit(txt, rect1.topleft)
-
-        txt = "if you choose more then one its with && operation between them"
-        txt = extra_small_font.render(txt, True, text_color)
-        rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6 + 70)
-        screen.blit(txt, rect1.topleft)
-
-        # buttons
-        hover = False
-        for b in buttons:
-            b.draw()
-            hover = hover or b.is_hover()
-        if hover:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
-        else:
-            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
-
-        exit_button.draw()
-        back_button.draw()
-
-        pygame.display.update()
-        clock.tick(fps)
-
-
 class query_button(button):
 
     def __init__(self, surface, text, x, y, width, height, name, index, active_color=light_purple,
@@ -343,7 +347,7 @@ class query_button(button):
         self.index = index
 
     def query(self):
-        return self.index
+        return query_object.query_obj(self.name)
 
     def draw(self):
         conditions = [False, True]
@@ -393,16 +397,88 @@ class send_button(button):
                 queries_to_send.insert(0, query.query())
 
         print("sending: ", queries_to_send)
+        send_queries(queries_to_send)
+
+
+def send(queries_l: list):
+    #  sending queries
+    to_send = pickle.dumps(queries_l)
+    to_send = bytes(f'{len(to_send) :< {HEADERSIZE}}', FORMAT) + to_send
+    client.send(to_send)
+
+    # receive answer
+    new_msg = True
+    answer = b''
+    msg_len = 0
+    while True:
+        msg = client.recv(16)
+        if new_msg:
+            msg_len = int(msg[:HEADERSIZE])
+            new_msg = False
+        else:
+            answer += msg
+        if len(answer) == msg_len:
+            answer = pickle.loads(answer)
+            break
+    chart(answer)
+
+
+
+def send_queries(queries_to_send: list):
+    send(queries_to_send)
+
+
+def queries_draw(buttons: list[button]):
+    global run
+    run = True
+
+    while run:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                send(DISCONNECT_MESSAGE)
+                pygame.quit()
+                quit()
+
+        # background
+        intro_background_img = pygame.image.load(background_img)
+        img = pygame.transform.scale(intro_background_img, (screen_w, screen_h))
+        screen.blit(img, (0, 0))
+
+        # text
+        txt = "Choose Your Queries"
+        txt = med_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
+        txt = "if you choose more then one its with && operation between them"
+        txt = extra_small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6 + 70)
+        screen.blit(txt, rect1.topleft)
+
+        # buttons
+        hover = False
+        for b in buttons:
+            b.draw()
+            hover = hover or b.is_hover()
+        if hover:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_HAND)
+        else:
+            pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+
+        exit_button.draw()
+        back_button.draw()
+
+        pygame.display.update()
+        clock.tick(fps)
 
 
 # universal buttons
 center_x = screen_w / 2
 back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
 exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
-
-# queries = []
-# send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries, black, gray,
-#                    text_color=(255, 255, 255))
 
 run = True
 
@@ -417,8 +493,7 @@ def start_screen():
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                _quit()
 
         # background
         intro_background_img = pygame.image.load(background_img)
@@ -433,13 +508,13 @@ def start_screen():
         screen.blit(txt, rect1.topleft)
 
         txt = aviv
-        txt = small_font.render(txt, True, text_color)
+        txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6 + 100)
         screen.blit(txt, rect1.topleft)
 
         txt = alon
-        txt = small_font.render(txt, True, text_color)
+        txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6 + 200)
         screen.blit(txt, rect1.topleft)
@@ -477,8 +552,7 @@ def queries_categories():
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                _quit()
 
         # background
         screen.fill((0, 0, 0))
@@ -510,32 +584,22 @@ def queries_categories():
         clock.tick(fps)
 
 
-# example for a table
-mat = [["Erling Haaland", "22", "MCFC", "CF", "26", "4"],
-       ["Harry Kane", "29", "Spurs", "CF", "17", "2"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Bukayo Saka", "21", "Arsenal", "RF", "9", "8"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"],
-       ["Ivan Toney", "26", "Brentford", "CF", "14", "3"], ["Ivan Toney", "26", "Brentford", "CF", "14", "3"]]
-titles = ["name", "age", "Team", "position", "goals", "assists"]
+# ["name", "age", "Team", "position", "goals", "assists"]
 
+def print_table(data: list[PL_player], delta_y):
+    matrix = [[data[i].get_name(), str(data[i].get_age()), data[i].get_team(), data[i].get_position(),
+               str(data[i].get_goal()), str(data[i].get_assists())] for i in range(len(data))]
 
-def print_table(matrix, delta_y):
     chunk_x = screen_w / 6
     chunk_y = screen_h / 10
 
     # boundaries
-    down_boundary = 570
+    down_boundary = 540
+    if len(data) <= 8:
+        delta_y = 0
     if delta_y < 0 and ((chunk_y * 2) - delta_y >= 120):
         delta_y = 0
-    elif delta_y > 0 and (chunk_y * (len(matrix) + 2) - delta_y) < down_boundary:
+    elif delta_y > 0 and (chunk_y * 2) - delta_y < 0 and (chunk_y * (len(matrix) + 2) - delta_y) < down_boundary:
         delta_y = chunk_y * (len(matrix) + 2) - down_boundary
 
     # lines
@@ -565,18 +629,19 @@ def print_table(matrix, delta_y):
     return delta_y
 
 
-def chart():
+def chart(table):
     global run
+    exp_button = explain_button(screen, "?", screen_w - 40, screen_h - 40, 40, 50, "explain", gray, gray, white,
+                                text_size=55)
     run = True
     delta_y = 0
-    scroll_speed = 10
+    scroll_speed = 4
     down = False
     up = False
     while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                _quit()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
@@ -596,9 +661,9 @@ def chart():
                 scroll_speed = 1
 
         if down:
-            delta_y -= scroll_speed
-        elif up:
             delta_y += scroll_speed
+        elif up:
+            delta_y -= scroll_speed
         # background
         into_background_img = pygame.image.load(background_img)
         img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
@@ -606,15 +671,28 @@ def chart():
         screen.blit(img, (0, 0))
 
         # chart
-        delta_y = print_table(mat, delta_y)
+        delta_y = print_table(table, delta_y)
 
         # buttons
         pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
         back_button.draw()
         exit_button.draw()
+        exp_button.draw()
 
         pygame.display.update()
         clock.tick(fps)
+
+
+def _quit():
+    print("SENDING EXIT MESSAGE")
+
+    to_send = pickle.dumps(DISCONNECT_MESSAGE)
+    to_send = bytes(f'{len(to_send) :< {HEADERSIZE}}', FORMAT) + to_send
+    client.send(to_send)
+
+    print("EXITING...")
+    pygame.quit()
+    quit()
 
 
 start_screen()
