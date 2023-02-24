@@ -167,7 +167,7 @@ class explain_button(button):
         if self.visible:
             if self.is_hover():
                 text1 = "Use UP/DOWN for scrolling"
-                text2 = "Use RIGHT/LEFT for controlling the scroll speed"
+                text2 = "Use RIGHT/LEFT to increase/decrease scroll speed"
                 text1 = regular_small_font.render(text1, True, black)
                 text2 = regular_small_font.render(text2, True, black)
                 text1_rect = text1.get_rect()
@@ -176,13 +176,18 @@ class explain_button(button):
                 text2_rect = text2.get_rect()
                 text2_rect.center = (center_x, screen_h / 2 + 100)
 
-                pygame.draw.rect(screen, green, (text2_rect.x - 10, text1_rect.y - 10, text2_rect.width + 20,
-                                                 (text2_rect.y - text1_rect.y) + text2_rect.height + 20))
+                pygame.draw.rect(screen, black, (text2_rect.x - 20, text1_rect.y - 20, text2_rect.width + 40,
+                                                 (text2_rect.y - text1_rect.y) + text2_rect.height + 40))
+                pygame.draw.rect(screen, green, (text2_rect.x - 15, text1_rect.y - 15, text2_rect.width + 30,
+                                                 (text2_rect.y - text1_rect.y) + text2_rect.height + 30))
+
                 self.screen.blit(text1, text1_rect.topleft)
                 self.screen.blit(text2, text2_rect.topleft)
-
-            pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
-            self.text_to_button()
+                pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
+                self.text_to_button()
+            else:
+                pygame.draw.rect(self.screen, self.active_color, (self.x, self.y, self.width, self.height))
+                self.text_to_button()
 
 
 class and_or_buttons(button):
@@ -373,7 +378,7 @@ class query_button(button):
             else:
                 pygame.draw.rect(self.screen, self.inactive_color, (self.x, self.y, self.width, self.height))
             if click_on:
-                pygame.draw.rect(self.screen, black,
+                pygame.draw.rect(self.screen, text_color,
                                  (self.x - 3, self.y - 3, self.width + 6, self.height + 6), 3)
             self.text_to_button()
 
@@ -631,7 +636,7 @@ def print_table(data: list[PL_player], delta_y):
 
 def chart(table):
     global run
-    exp_button = explain_button(screen, "?", screen_w - 40, screen_h - 40, 40, 50, "explain", gray, gray, white,
+    exp_button = explain_button(screen, "?", screen_w - 40, screen_h - 40, 40, 50, "explain", black,(50,50,50), white,
                                 text_size=55)
     run = True
     delta_y = 0
