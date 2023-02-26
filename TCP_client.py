@@ -232,18 +232,18 @@ class category_button(button):
         if self.name == "Goals":
             button_w = 150
             button_h = 75
-            gaol_q1 = query_button(screen, "query 21", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                                   "query21", 21, light_green, green)
-            gaol_q2 = query_button(screen, "query 22", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                                   "query22", 22, light_green, green)
-            gaol_q3 = query_button(screen, "query 23", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                                   "query23", 23, light_green, green)
-            gaol_q4 = query_button(screen, "query 24", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                                   "query24", 24, light_green, green)
-            gaol_q5 = query_button(screen, "query 25", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                                   "query25", 25, light_green, green)
-            gaol_q6 = query_button(screen, "query 26", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                                   "query26", 26, light_green, green)
+            gaol_q1 = query_button(screen, "no goals", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "no goals", 21, light_green, green)
+            gaol_q2 = query_button(screen, "goals >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "goals >= 2", 22, light_green, green)
+            gaol_q3 = query_button(screen, "goals < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "goals < 4", 23, light_green, green)
+            gaol_q4 = query_button(screen, "top scorer", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "top scorer", 24, light_green, green)
+            gaol_q5 = query_button(screen, "top 10 scorers", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "top 10 scorers", 25, light_green, green)
+            gaol_q6 = query_button(screen, "top 5 scorers", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "top 5 scorers", 26, light_green, green)
             queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
             send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
                                text_color=(255, 255, 255))
@@ -253,18 +253,18 @@ class category_button(button):
         if self.name == "Assists":
             button_w = 150
             button_h = 75
-            gaol_q1 = query_button(screen, "query 31", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                                   "query31", 31, light_green, green)
-            gaol_q2 = query_button(screen, "query 32", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                                   "query32", 32, light_green, green)
-            gaol_q3 = query_button(screen, "query 33", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                                   "query33", 33, light_green, green)
-            gaol_q4 = query_button(screen, "query 34", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                                   "query34", 34, light_green, green)
-            gaol_q5 = query_button(screen, "query 35", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                                   "query35", 35, light_green, green)
-            gaol_q6 = query_button(screen, "query 36", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                                   "query36", 36, light_green, green)
+            gaol_q1 = query_button(screen, "no assists", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "no assists", 31, light_green, green)
+            gaol_q2 = query_button(screen, "assists >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "assists >= 2", 32, light_green, green)
+            gaol_q3 = query_button(screen, "assists < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "assists < 4", 33, light_green, green)
+            gaol_q4 = query_button(screen, "top assistive", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "top assistive", 34, light_green, green)
+            gaol_q5 = query_button(screen, "top 10 assistive", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "top 10 assistive", 35, light_green, green)
+            gaol_q6 = query_button(screen, "top 5 assistive", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "top 5 assistive", 36, light_green, green)
             queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
             send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
                                text_color=(255, 255, 255))
@@ -593,7 +593,7 @@ def queries_categories():
 
 def print_table(data: list[PL_player], delta_y):
     matrix = [[data[i].get_name(), str(data[i].get_rate()), data[i].get_team(), data[i].get_position(),
-               str(data[i].get_goal()), str(data[i].get_assists())] for i in range(len(data))]
+               str(data[i].get_goals()), str(data[i].get_assists())] for i in range(len(data))]
     chunk_x = screen_w / 6
     chunk_y = screen_h / 10
 

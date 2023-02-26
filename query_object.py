@@ -35,30 +35,102 @@ class query_obj:
             for p in data:
                 if p.get_team() == "Porto":
                     ans.insert(0, p)
-        if self.query_name == "query21":
-            pass
-        if self.query_name == "query22":
-            pass
-        if self.query_name == "query23":
-            pass
-        if self.query_name == "query24":
-            pass
-        if self.query_name == "query25":
-            pass
-        if self.query_name == "query26":
-            pass
-        if self.query_name == "query31":
-            pass
-        if self.query_name == "query32":
-            pass
-        if self.query_name == "query33":
-            pass
-        if self.query_name == "query34":
-            pass
-        if self.query_name == "query35":
-            pass
-        if self.query_name == "query36":
-            pass
+        if self.query_name == "no goals":
+            for p in data:
+                if p.get_goals() == 0:
+                    ans.insert(0, p)
+        if self.query_name == "goals >= 2":
+            for p in data:
+                if p.get_goals() >= 2:
+                    ans.insert(0, p)
+        if self.query_name == "goals < 4":
+            for p in data:
+                if p.get_goals() < 4:
+                    ans.insert(0, p)
+        if self.query_name == "top scorer":
+            max_score = -1
+            top_scorer = None
+            for p in data:
+                if p.get_goals() >= max_score:
+                    top_scorer = p
+                    max_score = p.get_goals()
+            ans.insert(0, top_scorer)
+        if self.query_name == "top 10 scorers":
+            top_10 = []
+            for i, p in enumerate(data):
+                if i < 10:
+                    top_10.insert(0, p)
+                else:
+                    for listed in top_10:
+                        if p.get_goals() > listed.get_goals() or (
+                                p.get_goals() == listed.get_goals() and p.get_assists() > listed.get_assists()):
+                            top_10.remove(listed)
+                            top_10.insert(0, p)
+                            break
+
+            ans = top_10
+        if self.query_name == "top 5 scorers":
+            top_5 = []
+
+            for counter,p in enumerate(data):
+                if counter < 5:
+                    top_5.insert(0, p)
+                else:
+                    for listed in top_5:
+                        if p.get_goals() > listed.get_goals() or (
+                                p.get_goals() == listed.get_goals() and p.get_assists() >= listed.get_assists()):
+                            top_5.remove(listed)
+                            top_5.insert(0, p)
+                            break
+            ans = top_5
+        if self.query_name == "no assists":
+            for p in data:
+                if p.get_assists() == 0:
+                    ans.insert(0, p)
+        if self.query_name == "assists >= 2":
+            for p in data:
+                if p.get_assists() >= 2:
+                    ans.insert(0, p)
+        if self.query_name == "assists < 4":
+            for p in data:
+                if p.get_assists() < 4:
+                    ans.insert(0, p)
+        if self.query_name == "top assistive":
+            max_score = -1
+            top_assistive = None
+            for p in data:
+                if p.get_assists() >= max_score:
+                    top_assistive = p
+                    max_score = p.get_assists()
+            ans.insert(0, top_assistive)
+        if self.query_name == "top 10 assistive":
+            top_10 = []
+            for i, p in enumerate(data):
+                if i < 10:
+                    top_10.insert(0, p)
+                else:
+                    for listed in top_10:
+                        if p.get_assists() > listed.get_assists() or (
+                                p.get_assists() == listed.get_assists() and p.get_goals() > listed.get_goals()):
+                            top_10.remove(listed)
+                            top_10.insert(0, p)
+                            break
+
+            ans = top_10
+        if self.query_name == "top 5 assistive":
+            top_5 = []
+            for i, p in enumerate(data):
+                if i < 5:
+                    top_5.insert(0, p)
+                else:
+                    for listed in top_5:
+                        if p.get_assists() > listed.get_assists() or (
+                                p.get_assists() == listed.get_assists() and p.get_goals() > listed.get_goals()):
+                            top_5.remove(listed)
+                            top_5.insert(0, p)
+                            break
+
+            ans = top_5
         if self.query_name == "query41":
             for p in data:
                 if p.get_age() > 25:
