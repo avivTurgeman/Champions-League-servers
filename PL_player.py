@@ -1,7 +1,7 @@
 class PL_player:
-    def __init__(self, name: str, age: int, team: str, position: str, goals: int, assists: int) -> None:
+    def __init__(self, name: str, rate: float, team: str, position: str, goals: int, assists: int) -> None:
         self.name = name
-        self.age = age
+        self.rate = rate
         self.team = team
         self.position = position
         self.goals = goals
@@ -10,8 +10,8 @@ class PL_player:
     def get_name(self):
         return self.name
 
-    def get_age(self):
-        return self.age
+    def get_rate(self):
+        return self.rate
 
     def get_team(self):
         return self.team

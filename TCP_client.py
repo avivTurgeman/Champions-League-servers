@@ -27,7 +27,7 @@ pygame.font.init()
 fonts = pygame.font.get_fonts()
 
 
-titles = ["name", "age", "Team", "position", "goals", "assists"]
+titles = ["name", "rating", "Team", "position", "goals", "assists"]
 
 # icon
 icon = pygame.image.load('sql_icon.png')
@@ -35,7 +35,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-# mixer.music.play(-1, 754.0)
+mixer.music.play(-1, 754.0)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -58,14 +58,14 @@ light_pink = (255, 190, 203)
 pink = (255, 100, 147)
 white = (255, 255, 255)
 
-text_color = black
+text_color = white
 
-background_img = "background2.jpg"
+background_img = "champions_league_background2.png"
 
 screen = pygame.display.set_mode((screen_w, screen_h))
 
 # universal text
-welcome_text = "Premier League Players SQL"
+welcome_text1 = "Champions League"
 aviv = "Aviv Turgeman - 208007351"
 alon = "Alon Suissa - 211344015"
 
@@ -75,7 +75,7 @@ special_small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
 regular_small_font = pygame.font.Font('freesansbold.ttf', 30)
 extra_small_font = pygame.font.Font('freesansbold.ttf', 20)
 
-chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 20)
+chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 18)
 
 pygame.display.set_caption("SQL project")
 
@@ -125,8 +125,8 @@ class button:
         if self.name == "exit":
             _quit()
         if self.name == "dont":
-            global welcome_text, background_img, text_color
-            welcome_text = "obviously..."
+            global welcome_text1, background_img, text_color
+            welcome_text1 = "obviously..."
             background_img = "hell.jpg"
             text_color = white
             self.visible = False
@@ -277,7 +277,7 @@ class category_button(button):
             buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
             queries_draw(buttons_list)
             run = True
-        if self.name == "Age":
+        if self.name == "Rate":
             button_w = 150
             button_h = 75
             gaol_q1 = query_button(screen, "query 41", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
@@ -493,7 +493,7 @@ def start_screen():
                          text_size=21)
     chart_button = button(screen, "full chart", center_x - 250 - 50, 400, 120, 70, "chart", blue, light_blue)
     queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "queries", blue, light_blue)
-    global run, welcome_text
+    global run, welcome_text1
     run = True
     while run:
         for event in pygame.event.get():
@@ -506,7 +506,14 @@ def start_screen():
         screen.blit(img, (0, 0))
 
         # text
-        txt = welcome_text
+        txt = welcome_text1
+        txt = med_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.center = (center_x, screen_h / 6)
+        screen.blit(txt, rect1.topleft)
+
+
+        txt = welcome_text1
         txt = med_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
         rect1.center = (center_x, screen_h / 6)
@@ -515,13 +522,13 @@ def start_screen():
         txt = aviv
         txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6 + 100)
+        rect1.center = (center_x - 250, screen_h / 6 + 100)
         screen.blit(txt, rect1.topleft)
 
         txt = alon
         txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6 + 200)
+        rect1.center = (center_x - 270 , screen_h / 6 + 200)
         screen.blit(txt, rect1.topleft)
 
         # buttons
@@ -546,8 +553,8 @@ def queries_categories():
     category3_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
                                         button_w, button_h, "Assists", light_green, green)
 
-    category4_Age = category_button(screen, "Age", screen_w / 2 - button_w / 2 - 200, 375,
-                                    button_w, button_h, "Age", light_green, green)
+    category4_Rate = category_button(screen, "Rate", screen_w / 2 - button_w / 2 - 200, 375,
+                                    button_w, button_h, "Rate", light_green, green)
     category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
                                        button_w, button_h, "Number", light_green, green)
     category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 200, 375,
@@ -581,7 +588,7 @@ def queries_categories():
         category2_Goals.draw()
         category3_Assists.draw()
         category1_Teams.draw()
-        category4_Age.draw()
+        category4_Rate.draw()
         category5_Number.draw()
         category6_Position.draw()
 
@@ -589,10 +596,10 @@ def queries_categories():
         clock.tick(fps)
 
 
-# ["name", "age", "Team", "position", "goals", "assists"]
+# ["name", "rate", "Team", "position", "goals", "assists"]
 
 def print_table(data: list[PL_player], delta_y):
-    matrix = [[data[i].get_name(), str(data[i].get_age()), data[i].get_team(), data[i].get_position(),
+    matrix = [[data[i].get_name(), str(data[i].get_rate()), data[i].get_team(), data[i].get_position(),
                str(data[i].get_goal()), str(data[i].get_assists())] for i in range(len(data))]
 
     chunk_x = screen_w / 6
@@ -619,7 +626,7 @@ def print_table(data: list[PL_player], delta_y):
     # titles
     title_font = pygame.font.Font('freesansbold.ttf', 20)
     for i in range(0, len(titles)):
-        text = title_font.render(titles[i], True, gray)
+        text = title_font.render(titles[i], True, white)
         rect = text.get_rect()
         rect.center = (int(chunk_x * (0.5 + i)), int(60 + chunk_y / 2) - delta_y)
         screen.blit(text, rect.topleft)
