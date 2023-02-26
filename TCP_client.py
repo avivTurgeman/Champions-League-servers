@@ -274,14 +274,14 @@ class category_button(button):
         if self.name == "Rating":
             button_w = 150
             button_h = 75
-            gaol_q1 = query_button(screen, "query 41", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                                   "query41", 41, light_green, green)
-            gaol_q2 = query_button(screen, "query 42", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                                   "query42", 42, light_green, green)
-            gaol_q3 = query_button(screen, "query 43", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                                   "query43", 43, light_green, green)
-            gaol_q4 = query_button(screen, "query 44", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                                   "query44", 44, light_green, green)
+            gaol_q1 = query_button(screen, "rating > 3.5", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "rating > 3.5", 41, light_green, green)
+            gaol_q2 = query_button(screen, "rating < 7.0", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                                   "rating < 7.0", 42, light_green, green)
+            gaol_q3 = query_button(screen, "rating < 6.2", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "rating < 6.2", 43, light_green, green)
+            gaol_q4 = query_button(screen, "rating > 7.5", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "rating > 7.5", 44, light_green, green)
             gaol_q5 = query_button(screen, "query 45", screen_w / 2 - button_w / 2, 375, button_w, button_h,
                                    "query45", 45, light_green, green)
             gaol_q6 = query_button(screen, "query 26", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,

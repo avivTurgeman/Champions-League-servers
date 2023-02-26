@@ -131,18 +131,23 @@ class query_obj:
                             break
 
             ans = top_5
-        if self.query_name == "query41":
+        if self.query_name == "rating > 3.5":
             for p in data:
-                if p.get_age() > 25:
+                if p.get_rate() > 3.5:
                     ans.insert(0, p)
-        if self.query_name == "query42":
+        if self.query_name == "rating < 7.0":
             for p in data:
-                if p.get_age() < 28:
+                if p.get_rate() < 7.0:
                     ans.insert(0, p)
-        if self.query_name == "query43":
-            pass
-        if self.query_name == "query44":
-            pass
+        if self.query_name == "rating < 6.2":
+            for p in data:
+                if p.get_rate() < 6.2:
+                    ans.insert(0, p)
+        if self.query_name == "rating > 7.5":
+            for p in data:
+                if p.get_rate() > 7.5:
+                    ans.insert(0, p)
+
         if self.query_name == "query45":
             pass
         if self.query_name == "query46":
