@@ -7,7 +7,7 @@ import query_object
 
 # defines
 HEADERSIZE = 16
-PORT = 5056
+PORT = 5057
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
 SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
@@ -35,7 +35,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1, 754.0)
+# mixer.music.play(-1, 754.0)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -166,8 +166,8 @@ class explain_button(button):
     def draw(self):
         if self.visible:
             if self.is_hover():
-                text1 = "Use UP/DOWN for scrolling"
-                text2 = "Use RIGHT/LEFT to increase/decrease scroll speed"
+                text1 = "Use UP/DOWN buttons for scrolling"
+                text2 = "Use LEFT/RIGHT to decrease/increase scroll speed"
                 text1 = regular_small_font.render(text1, True, black)
                 text2 = regular_small_font.render(text2, True, black)
                 text1_rect = text1.get_rect()

@@ -5,7 +5,6 @@ import pickle
 from PL_player import PL_player
 import query_object
 
-# todo synchronized data/ or maybe not ?
 data = [PL_player("Erling Haaland", 22, "MCFC", "CF", 26, 4),
         PL_player("Harry Kane", 29, "Spurs", "CF", 17, 2),
         PL_player("Ivan Toney", 26, "Brentford", "CF", 14, 3),
@@ -30,7 +29,7 @@ data = [PL_player("Erling Haaland", 22, "MCFC", "CF", 26, 4),
         ]
 
 HEADERSIZE = 16
-PORT = 5056
+PORT = 5057
 SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
@@ -66,7 +65,7 @@ def handle_client(conn, addr):
                     break
                 answer = filter_by_queries(full_msg)
                 answer = pickle.dumps(answer)
-                answer = bytes(f'{len(answer) :< {HEADERSIZE}}', FORMAT) + answer
+                answer = bytes(f'{len(answer) :< {HEADERSIZE}}', FORMAT) + answer  # todo check the vid again
                 conn.send(answer)
 
                 full_msg = b''
