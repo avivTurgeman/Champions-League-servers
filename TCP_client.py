@@ -125,7 +125,6 @@ class button:
         if self.name == "exit":
             _quit()
 
-
     def is_clicked(self):
         click = self.clicked
         self.clicked = False
@@ -210,20 +209,20 @@ class category_button(button):
         click_sound.play()
         global run
         if self.name == "Team":
-            button_w = 150
-            button_h = 75
-            gaol_q1 = query_button(screen, "Spurs", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                                   "query11", 21, light_green, green)
+            button_w = 170
+            button_h = 80
+            gaol_q1 = query_button(screen, "Liverpool", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                                   "Liverpool", 21, light_green, green)
             gaol_q2 = query_button(screen, "MCFC", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                                   "query12", 12, light_green, green)
-            gaol_q3 = query_button(screen, "Brentford", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                                   "query13", 13, light_green, green)
-            gaol_q4 = query_button(screen, "Arsenal", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                                   "query14", 14, light_green, green)
-            gaol_q5 = query_button(screen, "query 15", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                                   "query15", 15, light_green, green)
-            gaol_q6 = query_button(screen, "query 16", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                                   "query16", 16, light_green, green)
+                                   "MCFC", 12, light_green, green)
+            gaol_q3 = query_button(screen, "Real Madrid", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                                   "Real Madrid", 13, light_green, green)
+            gaol_q4 = query_button(screen, "PSG", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                                   "PSG", 14, light_green, green)
+            gaol_q5 = query_button(screen, "Bayren Munich", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                                   "Bayren Munich", 15, light_green, green)
+            gaol_q6 = query_button(screen, "Porto", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                                   "Porto", 16, light_green, green)
             queries_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6]
             send = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
                                text_color=(255, 255, 255))
@@ -396,7 +395,13 @@ class send_button(button):
                 # add that query to the sending query
                 queries_to_send.insert(0, query.query())
 
-        print("sending: ", queries_to_send)
+        print("sending: ", end=" [")
+        for i,q in enumerate(queries_to_send):
+            if i == 0:
+                print(q.query_name, end="")
+            else:
+                print(",", q.query_name, end="")
+        print("]")
         send_queries(queries_to_send)
 
 
@@ -589,7 +594,6 @@ def queries_categories():
 def print_table(data: list[PL_player], delta_y):
     matrix = [[data[i].get_name(), str(data[i].get_rate()), data[i].get_team(), data[i].get_position(),
                str(data[i].get_goal()), str(data[i].get_assists())] for i in range(len(data))]
-
     chunk_x = screen_w / 6
     chunk_y = screen_h / 10
 
@@ -606,10 +610,12 @@ def print_table(data: list[PL_player], delta_y):
     for i in range(2, len(matrix) + 2):
         pygame.draw.line(screen, text_color, (0, (chunk_y * i) - delta_y),
                          (chunk_x * (len(matrix[0])), (chunk_y * i) - delta_y))
-
-    for i in range(1, len(matrix[0])):
+    for i in range(1, 6):
         pygame.draw.line(screen, text_color, (chunk_x * i, 60 - delta_y),
                          (chunk_x * i, chunk_y * (len(matrix) + 2) - delta_y))
+    if len(matrix) == 0:
+        pygame.draw.line(screen, text_color, (0, (chunk_y * 2) - delta_y),
+                         (chunk_x * 6, (chunk_y * 2) - delta_y))
 
     # titles
     title_font = pygame.font.Font('freesansbold.ttf', 20)

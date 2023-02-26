@@ -11,29 +11,29 @@ class query_obj:
         ans = []
         if self.query_name == "full":
             return data
-        if self.query_name == "query11":
+        if self.query_name == "Liverpool":
             for p in data:
-                if p.get_team() == "Spurs":
+                if p.get_team() == "Liverpool":
                     ans.insert(0, p)
-        if self.query_name == "query12":
+        if self.query_name == "MCFC":
             for p in data:
                 if p.get_team() == "MCFC":
                     ans.insert(0, p)
-        if self.query_name == "query13":
+        if self.query_name == "Real Madrid":
             for p in data:
-                if p.get_team() == "Brentford":
+                if p.get_team() == "RMFC":
                     ans.insert(0, p)
-        if self.query_name == "query14":
+        if self.query_name == "PSG":
             for p in data:
-                if p.get_team() == "Arsenal":
+                if p.get_team() == "PSG":
                     ans.insert(0, p)
-        if self.query_name == "query15":
+        if self.query_name == "Bayren Munich":
             for p in data:
-                if p.get_team() == "Spurs":
+                if p.get_team() == "FCBM":
                     ans.insert(0, p)
-        if self.query_name == "query16":
+        if self.query_name == "Porto":
             for p in data:
-                if p.get_team() == "Spurs":
+                if p.get_team() == "Porto":
                     ans.insert(0, p)
         if self.query_name == "query21":
             pass

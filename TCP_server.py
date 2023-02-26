@@ -122,7 +122,7 @@ def handle_client(conn, addr):
                     break
                 answer = filter_by_queries(full_msg)
                 answer = pickle.dumps(answer)
-                # :< fill all the header
+                # :< fill (pad) all the header
                 # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
                 answer = bytes(f'{len(answer) :< {HEADERSIZE}}', FORMAT) + answer
                 conn.send(answer)
