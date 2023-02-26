@@ -6,7 +6,7 @@ from PL_player import PL_player
 import query_object
 
 # defines
-HEADERSIZE = 16
+HEADERSIZE = 8
 PORT = 5057
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
@@ -25,7 +25,6 @@ else:
 pygame.init()
 pygame.font.init()
 fonts = pygame.font.get_fonts()
-
 
 titles = ["name", "rating", "Team", "position", "goals", "assists"]
 
@@ -57,6 +56,7 @@ gray = (40, 40, 40)
 light_pink = (255, 190, 203)
 pink = (255, 100, 147)
 white = (255, 255, 255)
+background_color = (0, 0, 80)  # deep blue
 
 text_color = white
 
@@ -124,12 +124,7 @@ class button:
             run = False
         if self.name == "exit":
             _quit()
-        if self.name == "dont":
-            global welcome_text1, background_img, text_color
-            welcome_text1 = "obviously..."
-            background_img = "hell.jpg"
-            text_color = white
-            self.visible = False
+
 
     def is_clicked(self):
         click = self.clicked
@@ -277,7 +272,7 @@ class category_button(button):
             buttons_list = [gaol_q1, gaol_q2, gaol_q3, gaol_q4, gaol_q5, gaol_q6, send]
             queries_draw(buttons_list)
             run = True
-        if self.name == "Rate":
+        if self.name == "Rating":
             button_w = 150
             button_h = 75
             gaol_q1 = query_button(screen, "query 41", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
@@ -415,18 +410,19 @@ def send(queries_l: list):
     new_msg = True
     answer = b''
     msg_len = 0
+    get_size = HEADERSIZE
     while True:
-        msg = client.recv(16)
+        msg = client.recv(get_size)
         if new_msg:
             msg_len = int(msg[:HEADERSIZE])
             new_msg = False
+            get_size = 64
         else:
             answer += msg
         if len(answer) == msg_len:
             answer = pickle.loads(answer)
             break
     chart(answer)
-
 
 
 def send_queries(queries_to_send: list):
@@ -489,10 +485,8 @@ run = True
 
 
 def start_screen():
-    dont_button = button(screen, "DO NOT CLICK!", screen_w / 2 - 50, 400, 120, 70, "dont", blue, light_blue,
-                         text_size=21)
-    chart_button = button(screen, "full chart", center_x - 250 - 50, 400, 120, 70, "chart", blue, light_blue)
-    queries_button = button(screen, "queries", center_x + 250 - 50, 400, 120, 70, "queries", blue, light_blue)
+    chart_button = button(screen, "full chart", 50, 450, 120, 70, "chart", blue, light_blue)
+    queries_button = button(screen, "queries", 50 + 200, 450, 120, 70, "queries", blue, light_blue)
     global run, welcome_text1
     run = True
     while run:
@@ -509,26 +503,23 @@ def start_screen():
         txt = welcome_text1
         txt = med_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6)
+        rect1.topleft = (50, screen_h / 6 - 50)
         screen.blit(txt, rect1.topleft)
 
-
-        txt = welcome_text1
-        txt = med_font.render(txt, True, text_color)
-        rect1 = txt.get_rect()
-        rect1.center = (center_x, screen_h / 6)
-        screen.blit(txt, rect1.topleft)
+        sql_text = "Players SQL"
+        sql_text = med_font.render(sql_text, True, text_color)
+        screen.blit(sql_text, (50, screen_h / 6 + 50))
 
         txt = aviv
         txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
-        rect1.center = (center_x - 250, screen_h / 6 + 100)
+        rect1.topleft = (50, screen_h / 6 + 150)
         screen.blit(txt, rect1.topleft)
 
         txt = alon
         txt = special_small_font.render(txt, True, text_color)
         rect1 = txt.get_rect()
-        rect1.center = (center_x - 270 , screen_h / 6 + 200)
+        rect1.topleft = (50, screen_h / 6 + 250)
         screen.blit(txt, rect1.topleft)
 
         # buttons
@@ -536,7 +527,6 @@ def start_screen():
         chart_button.draw()
         queries_button.draw()
         exit_button.draw()
-        dont_button.draw()
 
         pygame.display.update()
         clock.tick(fps)
@@ -553,11 +543,10 @@ def queries_categories():
     category3_Assists = category_button(screen, "Assists", screen_w / 2 - button_w / 2 + 200, 250,
                                         button_w, button_h, "Assists", light_green, green)
 
-    category4_Rate = category_button(screen, "Rate", screen_w / 2 - button_w / 2 - 200, 375,
-                                    button_w, button_h, "Rate", light_green, green)
-    category5_Number = category_button(screen, "Number", screen_w / 2 - button_w / 2, 375,
-                                       button_w, button_h, "Number", light_green, green)
-    category6_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 200, 375,
+    category4_Rate = category_button(screen, "Rating", center_x - button_w / 2 - 100, 375,
+                                     button_w, button_h, "Rating", light_green, green)
+
+    category5_Position = category_button(screen, "Position", screen_w / 2 - button_w / 2 + 100, 375,
                                          button_w, button_h, "Position", light_green, green)
     global run
     run = True
@@ -589,14 +578,13 @@ def queries_categories():
         category3_Assists.draw()
         category1_Teams.draw()
         category4_Rate.draw()
-        category5_Number.draw()
-        category6_Position.draw()
+        category5_Position.draw()
 
         pygame.display.update()
         clock.tick(fps)
 
 
-# ["name", "rate", "Team", "position", "goals", "assists"]
+# ["name", "Rating", "Team", "position", "goals", "assists"]
 
 def print_table(data: list[PL_player], delta_y):
     matrix = [[data[i].get_name(), str(data[i].get_rate()), data[i].get_team(), data[i].get_position(),
@@ -643,7 +631,8 @@ def print_table(data: list[PL_player], delta_y):
 
 def chart(table):
     global run
-    exp_button = explain_button(screen, "?", screen_w - 40, screen_h - 40, 40, 50, "explain", black,(50,50,50), white,
+    exp_button = explain_button(screen, "?", screen_w - 40, screen_h - 40, 40, 50, "explain", black, (50, 50, 50),
+                                white,
                                 text_size=55)
     run = True
     delta_y = 0
@@ -677,10 +666,10 @@ def chart(table):
         elif up:
             delta_y -= scroll_speed
         # background
-        into_background_img = pygame.image.load(background_img)
-        img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
-        # img = blur_img(img, 100)
-        screen.blit(img, (0, 0))
+        # into_background_img = pygame.image.load(background_img)
+        # img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
+        # screen.blit(img, (0, 0))
+        screen.fill(background_color)
 
         # chart
         delta_y = print_table(table, delta_y)
