@@ -16,7 +16,7 @@ class PL_player:
     def get_team(self):
         return self.team
 
-    def get_position(self):
+    def get_position(self) -> str:
         return self.position
 
     def get_goals(self):

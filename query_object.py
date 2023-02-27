@@ -72,7 +72,7 @@ class query_obj:
         if self.query_name == "top 5 scorers":
             top_5 = []
 
-            for counter,p in enumerate(data):
+            for counter, p in enumerate(data):
                 if counter < 5:
                     top_5.insert(0, p)
                 else:
@@ -148,32 +148,55 @@ class query_obj:
                 if p.get_rate() > 7.5:
                     ans.insert(0, p)
 
-        if self.query_name == "query45":
-            pass
-        if self.query_name == "query46":
-            pass
-        if self.query_name == "query51":
-            pass
-        if self.query_name == "query52":
-            pass
-        if self.query_name == "query53":
-            pass
-        if self.query_name == "query54":
-            pass
+        if self.query_name == "top 10 rating":
+            top_10 = []
+            for i, p in enumerate(data):
+                if i < 10:
+                    top_10.insert(0, p)
+                else:
+                    for listed in top_10:
+                        if p.get_rate() > listed.get_rate() or (
+                                p.get_rate() == listed.get_rate() and p.get_goals() > listed.get_goals()):
+                            top_10.remove(listed)
+                            top_10.insert(0, p)
+                            break
+
+            ans = top_10
+        if self.query_name == "top 5 rating":
+            top_5 = []
+            for i, p in enumerate(data):
+                if i < 5:
+                    top_5.insert(0, p)
+                else:
+                    for listed in top_5:
+                        if p.get_rate() > listed.get_rate() or (
+                                p.get_rate() == listed.get_rate() and p.get_goals() > listed.get_goals()):
+                            top_5.remove(listed)
+                            top_5.insert(0, p)
+                            break
+
+            ans = top_5
+        if self.query_name == "Goalkeepers":
+            for p in data:
+                if p.get_position() == "GK":
+                    ans.insert(0, p)
+        if self.query_name == "Defenders":
+            for p in data:
+                if p.get_position()[1] == "B":
+                    ans.insert(0, p)
+        if self.query_name == "midfielders":
+            for p in data:
+                if p.get_position()[1] == "M":
+                    ans.insert(0, p)
+        if self.query_name == "Forwards":
+            for p in data:
+                if p.get_position()[1] == "F":
+                    ans.insert(0, p)
         if self.query_name == "query55":
             pass
         if self.query_name == "query56":
             pass
-        if self.query_name == "query61":
-            pass
-        if self.query_name == "query62":
-            pass
-        if self.query_name == "query63":
-            pass
-        if self.query_name == "query64":
-            pass
-        if self.query_name == "query65":
-            pass
+
         return ans
 
     def is_exit(self):

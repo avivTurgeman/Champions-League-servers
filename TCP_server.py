@@ -115,7 +115,7 @@ def handle_client(conn, addr):
 
             if len(full_msg) == msg_len:
                 print("full message received!")
-
+                print("processing request...")
                 full_msg = pickle.loads(full_msg)
                 if full_msg[0].is_exit():
                     print("disconnecting from", addr)
@@ -125,6 +125,7 @@ def handle_client(conn, addr):
                 # :< fill (pad) all the header
                 # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
                 answer = bytes(f'{len(answer) :< {HEADERSIZE}}', FORMAT) + answer
+                print("sending response",end="\n\n")
                 conn.send(answer)
                 get_size = HEADERSIZE
                 full_msg = b''

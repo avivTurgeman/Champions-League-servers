@@ -26,7 +26,7 @@ pygame.init()
 pygame.font.init()
 fonts = pygame.font.get_fonts()
 
-titles = ["name", "rating", "Team", "position", "goals", "assists"]
+titles = ["Name", "Rating", "Team", "Position", "Goals", "Assists"]
 
 # icon
 icon = pygame.image.load('sql_icon.png')
@@ -34,7 +34,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1, 754.0)
+mixer.music.play(-1,fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -235,9 +235,9 @@ class category_button(button):
             button_h = 75
             q1 = query_button(screen, "no goals", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
                               "no goals", 21, light_green, green)
-            q2 = query_button(screen, "goals >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+            q2 = query_button(screen, "Goals >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
                               "goals >= 2", 22, light_green, green)
-            q3 = query_button(screen, "goals < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+            q3 = query_button(screen, "Goals < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
                               "goals < 4", 23, light_green, green)
             q4 = query_button(screen, "top scorer", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
                               "top scorer", 24, light_green, green)
@@ -249,62 +249,48 @@ class category_button(button):
         if self.name == "Assists":
             button_w = 150
             button_h = 75
-            q1 = query_button(screen, "no assists", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+            q1 = query_button(screen, "no Assists", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
                               "no assists", 31, light_green, green)
-            q2 = query_button(screen, "assists >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+            q2 = query_button(screen, "Assists >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
                               "assists >= 2", 32, light_green, green)
-            q3 = query_button(screen, "assists < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+            q3 = query_button(screen, "Assists < 4", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
                               "assists < 4", 33, light_green, green)
-            q4 = query_button(screen, "top assistive", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+            q4 = query_button(screen, "top Assistive", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
                               "top assistive", 34, light_green, green)
-            q5 = query_button(screen, "top 10 assistive", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+            q5 = query_button(screen, "top 10 Assistive", screen_w / 2 - button_w / 2, 375, button_w, button_h,
                               "top 10 assistive", 35, light_green, green)
-            q6 = query_button(screen, "top 5 assistive", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+            q6 = query_button(screen, "top 5 Assistive", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
                               "top 5 assistive", 36, light_green, green)
 
         if self.name == "Rating":
             button_w = 150
             button_h = 75
-            q1 = query_button(screen, "rating > 3.5", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+            q1 = query_button(screen, "Rating > 3.5", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
                               "rating > 3.5", 41, light_green, green)
-            q2 = query_button(screen, "rating < 7.0", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+            q2 = query_button(screen, "Rating < 7.0", screen_w / 2 - button_w / 2, 250, button_w, button_h,
                               "rating < 7.0", 42, light_green, green)
-            q3 = query_button(screen, "rating < 6.2", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+            q3 = query_button(screen, "Rating < 6.2", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
                               "rating < 6.2", 43, light_green, green)
-            q4 = query_button(screen, "rating > 7.5", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+            q4 = query_button(screen, "Rating > 7.5", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
                               "rating > 7.5", 44, light_green, green)
-            q5 = query_button(screen, "query 45", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                              "query45", 45, light_green, green)
-            q6 = query_button(screen, "query 26", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                              "query46", 46, light_green, green)
+            q5 = query_button(screen, "top 10 Rating", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                              "top 10 rating", 45, light_green, green)
+            q6 = query_button(screen, "top 5 Rating", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                              "top 5 rating", 46, light_green, green)
 
-        if self.name == "Number":
-            button_w = 150
-            button_h = 75
-            q1 = query_button(screen, "query 51", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                              "query51", 51, light_green, green)
-            q2 = query_button(screen, "query 52", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                              "query52", 52, light_green, green)
-            q3 = query_button(screen, "query 53", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                              "query53", 53, light_green, green)
-            q4 = query_button(screen, "query 54", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                              "query54", 54, light_green, green)
-            q5 = query_button(screen, "query 55", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                              "query55", 55, light_green, green)
-            q6 = query_button(screen, "query 56", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                              "query56", 56, light_green, green)
+
 
         if self.name == "Position":
             button_w = 150
             button_h = 75
-            q1 = query_button(screen, "query 61", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
-                              "query21", 61, light_green, green)
-            q2 = query_button(screen, "query 62", screen_w / 2 - button_w / 2, 250, button_w, button_h,
-                              "query62", 62, light_green, green)
-            q3 = query_button(screen, "query 63", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
-                              "query63", 63, light_green, green)
-            q4 = query_button(screen, "query 64", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
-                              "query64", 64, light_green, green)
+            q1 = query_button(screen, "Goalkeepers", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
+                              "Goalkeepers", 61, light_green, green)
+            q2 = query_button(screen, "Defenders", screen_w / 2 - button_w / 2, 250, button_w, button_h,
+                              "Defenders", 62, light_green, green)
+            q3 = query_button(screen, "midfielders", screen_w / 2 + 200 - button_w / 2, 250, button_w, button_h,
+                              "midfielders", 63, light_green, green)
+            q4 = query_button(screen, "Forwards", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
+                              "Forwards", 64, light_green, green)
             q5 = query_button(screen, "query 65", screen_w / 2 - button_w / 2, 375, button_w, button_h,
                               "query65", 65, light_green, green)
             q6 = query_button(screen, "query 66", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
