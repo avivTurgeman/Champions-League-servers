@@ -291,10 +291,10 @@ class category_button(button):
                               "midfielders", 63, light_green, green)
             q4 = query_button(screen, "Forwards", screen_w / 2 - 200 - button_w / 2, 375, button_w, button_h,
                               "Forwards", 64, light_green, green)
-            q5 = query_button(screen, "query 65", screen_w / 2 - button_w / 2, 375, button_w, button_h,
-                              "query65", 65, light_green, green)
-            q6 = query_button(screen, "query 66", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
-                              "query66", 66, light_green, green)
+            q5 = query_button(screen, "Left Wing", screen_w / 2 - button_w / 2, 375, button_w, button_h,
+                              "Left Wing", 65, light_green, green)
+            q6 = query_button(screen, "Right Wing", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
+                              "Right Wing", 66, light_green, green)
         queries_list = [q1, q2, q3, q4, q5, q6]
         send_ = send_button(screen, "send", screen_w / 2 - 50, 500, 100, 50, "send", queries_list, black, gray,
                             text_color=(255, 255, 255))

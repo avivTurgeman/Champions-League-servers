@@ -192,10 +192,14 @@ class query_obj:
             for p in data:
                 if p.get_position()[1] == "F":
                     ans.insert(0, p)
-        if self.query_name == "query55":
-            pass
-        if self.query_name == "query56":
-            pass
+        if self.query_name == "Left Wing":
+            for p in data:
+                if p.get_position()[0] == "L":
+                    ans.insert(0, p)
+        if self.query_name == "Right Wing":
+            for p in data:
+                if p.get_position()[0] == "R":
+                    ans.insert(0, p)
 
         return ans
 
