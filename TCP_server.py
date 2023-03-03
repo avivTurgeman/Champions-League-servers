@@ -117,7 +117,7 @@ def handle_client(conn, addr):
                 print("full message received!")
                 print("processing request...")
                 full_msg = pickle.loads(full_msg)
-                if full_msg[0].is_exit():
+                if full_msg != [] and full_msg[0].is_exit():
                     print("disconnecting from", addr)
                     break
                 answer = filter_by_queries(full_msg)

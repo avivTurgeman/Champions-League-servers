@@ -34,7 +34,7 @@ pygame.display.set_icon(icon)
 
 # sound
 mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1,fade_ms=5000)
+mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -247,8 +247,8 @@ class category_button(button):
                               "top 5 scorers", 26, light_green, green)
 
         if self.name == "Assists":
-            button_w = 150
-            button_h = 75
+            button_w = 170
+            button_h = 80
             q1 = query_button(screen, "no Assists", screen_w / 2 - 200 - button_w / 2, 250, button_w, button_h,
                               "no assists", 31, light_green, green)
             q2 = query_button(screen, "Assists >= 2", screen_w / 2 - button_w / 2, 250, button_w, button_h,
@@ -277,8 +277,6 @@ class category_button(button):
                               "top 10 rating", 45, light_green, green)
             q6 = query_button(screen, "top 5 Rating", screen_w / 2 + 200 - button_w / 2, 375, button_w, button_h,
                               "top 5 rating", 46, light_green, green)
-
-
 
         if self.name == "Position":
             button_w = 150
