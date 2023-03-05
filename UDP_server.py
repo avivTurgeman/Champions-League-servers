@@ -1,10 +1,11 @@
-# [name,rating,Team, position, goals, assissts]
 import socket
 import threading
 import pickle
 from PL_player import PL_player
 import query_object
+import functions
 
+# [name,rating,Team, position, goals, assists]
 data = [
     # Manchester City F.C.
     PL_player("Erling Haaland", 7.8, "MCFC", "CF", 5, 0),
@@ -85,12 +86,13 @@ data = [
     PL_player("Diogo Costa", 7.7, "Porto", "GK", 0, 0)
 ]
 
-LEN_HEADER_SIZE = 8
-PORT = 5090
+LEN_SIZE_HEADER = 8
+LEN_INDEX_HEADER = 8
+PORT = 6060
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
-CHUNK = 1024
+CHUNK = 128
 
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
@@ -102,10 +104,7 @@ def handle_client(ip, port):
     addr = (ip, port)
     print(f"new connection with {addr} ")
     full_msg = b''
-    connected = True
-    new_msg = True
-    msg_len = 0
-    get_size = LEN_HEADER_SIZE
+
 
     # creating new socket for this client
     current_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -113,6 +112,7 @@ def handle_client(ip, port):
     # todo: port_change++ synchronized
     current_addr = (SERVER_IP, current_port)
 
+    # free the port right after disconnecting
     current_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     current_sock.bind(current_addr)
 
@@ -120,41 +120,131 @@ def handle_client(ip, port):
     start_msg = bytes(' ', FORMAT)
     current_sock.sendto(start_msg, addr)
 
-    while connected:
-        msg = current_sock.recvfrom(get_size)[0]
-        if msg:
-            if new_msg:
-                msg_len = int(msg[:LEN_HEADER_SIZE])  # converting the length to int
-                print("the massage length:", msg_len)  # printing the length
-                get_size = CHUNK
-                new_msg = False
-            else:
-                full_msg += msg
+    while True:
+        full_msg = functions.receive(current_sock, addr)
 
-            if len(full_msg) == msg_len:
-                print("full message received!")
-                print("processing request...")
-                full_msg = pickle.loads(full_msg)
-                if full_msg != [] and full_msg[0].is_exit():
-                    print("disconnecting from", addr)
-                    clients.remove(addr)  # todo: synchronized
-                    break
-                answer = filter_by_queries(full_msg)
-                answer = pickle.dumps(answer)
-                # :< fill (pad) all the header
-                # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
-                current_sock.sendto(bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT), addr)
-                print("sending response", end="\n\n")
+        # EXIT message
+        if full_msg != [] and full_msg[0].is_exit():
+            print("disconnecting from", addr)
+            clients.remove(addr)  # todo: synchronized
+            break
 
-                # sending answer
-                counter = 0
-                while counter <= len(answer):
-                    current_sock.sendto(answer[counter:counter + CHUNK], addr)
-                    counter += CHUNK
+        answer = filter_by_queries(full_msg)
+        answer = pickle.dumps(answer)
+        # :< fill (pad) all the header
+        # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
 
-                get_size = LEN_HEADER_SIZE
-                full_msg = b''
-                new_msg = True
+        # current_sock.sendto(bytes(f'{len(answer) :< {LEN_SIZE_HEADER}}', FORMAT), addr)
+        print("sending response", end="\n\n")
+
+        # sending answer
+        functions.send_with_cc(current_sock, addr, answer)
+        full_msg = b''
+
+
+# def send_with_cc(cur_sock, addr, msg):
+#     window_size = 1
+#     window_index = 0
+#     time_limit = 5
+#     # turning the socket to non-blocking
+#     cur_sock.setblocking(0)
+#
+#     bytes_rec = 0
+#     index = 0
+#     chunks = []
+#     while bytes_rec <= len(msg):
+#         chunks.insert(0, bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) +
+#                       bytes(f'{index :< {LEN_INDEX_HEADER}}', FORMAT) + msg[bytes_rec:bytes_rec + CHUNK])
+#         index += 1
+#         bytes_rec += CHUNK
+#     chunks.reverse()
+#
+#     state = [0 for _ in chunks]
+#     timestemps = [0.0 for _ in chunks]
+#     dup_ack = [-1, 0]  # [ack index , ack counter]
+#     while True:
+#         # send window and update timestemp
+#         for i in range(window_index, window_index + window_size):
+#             if state[i] == 0:
+#                 cur_sock.sendto(chunks[i], addr)
+#                 timestemps[i] = time.time()
+#         # recv acks -for every ack (1) increase window (2)move window (3) mark as true
+#         for _ in range(window_size):
+#             try:
+#                 ack = cur_sock.recvfrom(4)[0]
+#                 ack = int(ack)
+#                 if ack == dup_ack[0]:
+#                     dup_ack[1] += 1
+#                 else:
+#                     dup_ack[0] = ack
+#                     dup_ack[1] = 0
+#                 if dup_ack[1] >= 3:  # LATENCY!
+#                     window_size /= 2
+#                     cur_sock.sendto(chunks[ack], addr)
+#                 else:
+#                     for i in range(window_index, ack + 1):
+#                         if state[i] != 2:
+#                             state[i] = 2
+#                             window_size = increase_window(window_size)
+#
+#                     while state[window_index] == 2:
+#                         window_index += 1
+#
+#             except socket.error as e:
+#                 continue
+#
+#         # check timers
+#         for i in range(window_index, window_index + window_size):
+#             if state[i] == 1:
+#                 if time.time() - timestemps[i] >= time_limit:  # TIMEOUT!
+#                     window_size = 1
+#
+#         if state[-1] == 2:
+#             cur_sock.setblocking(1)
+#             break
+#
+#
+# def increase_window(window_size):
+#     if window_size < 16:
+#         return window_size * 2
+#     else:
+#         window_size += 1
+#
+#
+# def receive(cur_sock, addr):
+#     new_msg = True
+#     get_size = CHUNK
+#     max_seq_index = 0
+#     chunks = []
+#     indexes = []
+#     msg_len = 0
+#     bytes_received = 0
+#
+#     while True:
+#         msg = cur_sock.recvfrom(get_size)[0]
+#         if msg:
+#             msg_len = int(msg[:LEN_SIZE_HEADER])
+#             index = int(msg[LEN_SIZE_HEADER:LEN_INDEX_HEADER])
+#
+#             if max_seq_index == index:
+#                 max_seq_index += 1
+#             indexes.insert(0, index)
+#             while max_seq_index in indexes:
+#                 max_seq_index += 1
+#             chunks.insert(0, msg)
+#             bytes_received += len(msg[LEN_SIZE_HEADER + LEN_INDEX_HEADER:])
+#
+#             # sending ACK
+#             cur_sock.sendto(bytes(max_seq_index), addr)  # todo: padding needed?
+#
+#         if bytes_received == msg_len:
+#             # sort chunks by index
+#             chunks = sorted(chunks, key=lambda chunk_: chunk_[LEN_SIZE_HEADER:LEN_INDEX_HEADER], reverse=False)
+#             # combine chunks
+#             full_msg = b''
+#             for chunk in chunks:
+#                 full_msg += chunk[LEN_SIZE_HEADER + LEN_INDEX_HEADER:]
+#             return full_msg
 
 
 def start():

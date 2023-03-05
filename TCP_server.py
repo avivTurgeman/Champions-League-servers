@@ -90,7 +90,7 @@ PORT = 5050
 SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
-CHUNK = 1024
+CHUNK = 128
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
 server.bind(ADDR)  # binding the address

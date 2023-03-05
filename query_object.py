@@ -69,6 +69,7 @@ class query_obj:
                             break
 
             ans = top_10
+            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "top 5 scorers":
             top_5 = []
 

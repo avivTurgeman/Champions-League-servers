@@ -4,16 +4,18 @@ import socket
 import pickle
 from PL_player import PL_player
 import query_object
+import functions
 
 # defines
 protocol = "UDP"
-LEN_HEADER_SIZE = 8
-SERVER_PORT = 5090
+LEN_SIZE_HEADER = 8
+LEN_INDEX_HEADER = 8
+SERVER_PORT = 6060
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 SERVER_ADDR = (SERVER_IP, SERVER_PORT)
-CHUNK = 1024
+CHUNK = 128
 CLIENT = 1
 
 # init
@@ -27,6 +29,7 @@ icon = pygame.image.load('sql_icon.png')
 pygame.display.set_icon(icon)
 
 # sound
+mixer.music.set_volume(0.5)
 mixer.music.load('background_Sound.mp3')
 mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
@@ -377,18 +380,18 @@ def tcp_send(queries_l: list):
     global run
     #  sending queries
     to_send = pickle.dumps(queries_l)
-    to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
+    to_send = bytes(f'{len(to_send) :< {LEN_SIZE_HEADER}}', FORMAT) + to_send
     CLIENT.send(to_send)
 
     # receive answer
     new_msg = True
     answer = b''
     msg_len = 0
-    get_size = LEN_HEADER_SIZE
+    get_size = LEN_SIZE_HEADER
     while True:
         msg = CLIENT.recv(get_size)
         if new_msg:
-            msg_len = int(msg[:LEN_HEADER_SIZE])
+            msg_len = int(msg[:LEN_SIZE_HEADER])
             new_msg = False
             get_size = CHUNK
         else:
@@ -401,34 +404,88 @@ def tcp_send(queries_l: list):
 
 
 def udp_send(queries_l: list):
-    global SERVER_ADDR, run
+    global run
 
-    # sending the length and the queries
+    # the queries
     to_send = pickle.dumps(queries_l)
-    CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
-    counter = 0
-    while counter <= len(to_send):
-        CLIENT.sendto(to_send[counter:counter + CHUNK], SERVER_ADDR)
-        counter += CHUNK
+    functions.send_with_cc(CLIENT, SERVER_ADDR, to_send)
+    print("sent")
 
     # receive answer
-    new_msg = True
-    answer = b''
-    msg_len = 0
-    get_size = LEN_HEADER_SIZE
-    while True:
-        msg = CLIENT.recvfrom(get_size)[0]
-        if new_msg:
-            msg_len = int(msg[:LEN_HEADER_SIZE])
-            new_msg = False
-            get_size = CHUNK
-        else:
-            answer += msg
-            if len(answer) == msg_len:
-                answer = pickle.loads(answer)
-                break
+    answer = functions.receive(CLIENT, SERVER_ADDR)
+    print("got ans")
+
     chart(answer)
     run = True
+
+
+# def send_with_cc_udp(cur_sock, addr, msg):
+#     window_size = 1
+#     window_index = 0
+#     time_limit = 5
+#     # turning the socket to non-blocking
+#     cur_sock.setblocking(0)
+#
+#     bytes_rec = 0
+#     index = 0
+#     chunks = []
+#     while bytes_rec <= len(msg):
+#         chunks.insert(0, bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) +
+#                       bytes(f'{index :< {LEN_INDEX_HEADER}}', FORMAT) + msg[bytes_rec:bytes_rec + CHUNK])
+#         index += 1
+#         bytes_rec += CHUNK
+#     chunks.reverse()
+#
+#     state = [0 for _ in chunks]
+#     timestemps = [0.0 for _ in chunks]
+#     dup_ack = [-1, 0]  # [ack index , ack counter]
+#     while True:
+#         # send window and update timestemp
+#         for i in range(window_index, window_index + window_size):
+#             if state[i] == 0:
+#                 cur_sock.sendto(chunks[i], addr)
+#                 timestemps[i] = time.time()
+#         # recv acks -for every ack (1) increase window (2)move window (3) mark as true
+#         for _ in range(window_size):
+#             try:
+#                 ack = cur_sock.recvfrom(4)[0]
+#                 ack = int(ack)
+#                 if ack == dup_ack[0]:
+#                     dup_ack[1] += 1
+#                 else:
+#                     dup_ack[0] = ack
+#                     dup_ack[1] = 0
+#                 if dup_ack[1] >= 3:  # LATENCY!
+#                     window_size /= 2
+#                     cur_sock.sendto(chunks[ack], addr)
+#                 else:
+#                     for i in range(window_index, ack + 1):
+#                         if state[i] != 2:
+#                             state[i] = 2
+#                             window_size = increase_window(window_size)
+#
+#                     while state[window_index] == 2:
+#                         window_index += 1
+#
+#             except socket.error as e:
+#                 continue
+#
+#         # check timers
+#         for i in range(window_index, window_index + window_size):
+#             if state[i] == 1:
+#                 if time.time() - timestemps[i] >= time_limit:  # TIMEOUT!
+#                     window_size = 1
+#
+#         if state[-1] == 2:
+#             cur_sock.setblocking(1)
+#             break
+#
+#
+# def increase_window(window_size):
+#     if window_size < 16:
+#         return window_size * 2
+#     else:
+#         window_size += 1
 
 
 def send_queries(queries_to_send: list):
@@ -497,7 +554,7 @@ run = True
 
 
 def intro():
-    udp_button = button(screen, "UDP", 50, 450, 120, 70, "UDP", blue, light_blue)
+    udp_button = button(screen, "RUDP", 50, 450, 120, 70, "UDP", blue, light_blue)
     tcp_button = button(screen, "TCP", 50 + 200, 450, 120, 70, "TCP", blue, light_blue)
     global run, welcome_text1
     run = True
@@ -545,12 +602,12 @@ def intro():
 
 
 def connect_to_socket():
-    global SERVER_ADDR, CLIENT,SERVER_PORT
+    global SERVER_ADDR, CLIENT, SERVER_PORT
     # socket
     if protocol == "TCP":
         try:
             SERVER_PORT = 5050
-            SERVER_ADDR = (SERVER_IP,SERVER_PORT)
+            SERVER_ADDR = (SERVER_IP, SERVER_PORT)
             CLIENT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             CLIENT.connect(SERVER_ADDR)
         except ConnectionRefusedError as error:
@@ -779,10 +836,10 @@ def _quit():
 
     to_send = pickle.dumps(DISCONNECT_MESSAGE)
     if protocol == "TCP":
-        to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
+        to_send = bytes(f'{len(to_send) :< {LEN_SIZE_HEADER}}', FORMAT) + to_send
         CLIENT.send(to_send)
     if protocol == "UDP":
-        CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
+        CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_SIZE_HEADER}}', FORMAT), SERVER_ADDR)
         CLIENT.sendto(to_send, SERVER_ADDR)
     print("EXITING...")
     pygame.quit()
