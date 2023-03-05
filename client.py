@@ -13,6 +13,7 @@ FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 SERVER_ADDR = (SERVER_IP, SERVER_PORT)
+CHUNK = 1024
 
 # socket
 if protocol == "TCP":
@@ -404,7 +405,7 @@ def tcp_send(queries_l: list):
         if new_msg:
             msg_len = int(msg[:LEN_HEADER_SIZE])
             new_msg = False
-            get_size = 1024
+            get_size = CHUNK
         else:
             answer += msg
         if len(answer) == msg_len:
@@ -417,10 +418,13 @@ def tcp_send(queries_l: list):
 def udp_send(queries_l: list):
     global SERVER_ADDR, run
 
-    # sending the queries
+    # sending the length and the queries
     to_send = pickle.dumps(queries_l)
-    to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
-    client.sendto(to_send, SERVER_ADDR)
+    client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
+    counter = 0
+    while counter <= len(to_send):
+        client.sendto(to_send[counter:counter + CHUNK], SERVER_ADDR)
+        counter += CHUNK
 
     # receive answer
     new_msg = True
@@ -432,7 +436,7 @@ def udp_send(queries_l: list):
         if new_msg:
             msg_len = int(msg[:LEN_HEADER_SIZE])
             new_msg = False
-            get_size = 1024
+            get_size = CHUNK
         else:
             answer += msg
             if len(answer) == msg_len:
@@ -446,7 +450,7 @@ def send_queries(queries_to_send: list):
     if protocol == "TCP":
         tcp_send(queries_to_send)
     if protocol == "UDP":
-        pass
+        udp_send(queries_to_send)
 
 
 def queries_draw(buttons: list[button]):
@@ -716,7 +720,7 @@ def _quit():
         to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
         client.send(to_send)
     if protocol == "UDP":
-        client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT),SERVER_ADDR)
+        client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
         client.sendto(to_send, SERVER_ADDR)
     print("EXITING...")
     pygame.quit()

@@ -90,6 +90,7 @@ PORT = 5057
 SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
+CHUNK = 1024
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
 server.bind(ADDR)  # binding the address
@@ -108,7 +109,7 @@ def handle_client(conn, addr):
             if new_msg:
                 msg_len = int(msg[:LEN_HEADER_SIZE])  # converting the length to int
                 print("the massage length:", msg_len)  # printing the length
-                get_size = 1024
+                get_size = CHUNK
                 new_msg = False
             else:
                 full_msg += msg

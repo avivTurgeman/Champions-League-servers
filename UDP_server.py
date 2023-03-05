@@ -90,6 +90,7 @@ PORT = 5080
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
+CHUNK = 1024
 
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
@@ -97,8 +98,8 @@ clients = []  # todo: synchronized
 PORT_CHANGE = 1  # todo: synchronized
 
 
-def handle_client(ip,port):
-    addr = (ip,port)
+def handle_client(ip, port):
+    addr = (ip, port)
     print(f"new connection with {addr} ")
     full_msg = b''
     connected = True
@@ -123,7 +124,7 @@ def handle_client(ip,port):
             if new_msg:
                 msg_len = int(msg[:LEN_HEADER_SIZE])  # converting the length to int
                 print("the massage length:", msg_len)  # printing the length
-                get_size = 1024
+                get_size = CHUNK
                 new_msg = False
             else:
                 full_msg += msg
@@ -140,9 +141,15 @@ def handle_client(ip,port):
                 answer = pickle.dumps(answer)
                 # :< fill (pad) all the header
                 # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
-                answer = bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT) + answer
+                current_sock.sendto(bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT), addr)
                 print("sending response", end="\n\n")
-                current_sock.sendto(answer, addr)
+
+                # current_sock.sendto(answer, addr) todo: delete this line
+                counter = 0
+                while counter <= len(answer):
+                    current_sock.sendto(answer[counter:counter + CHUNK], addr)
+                    counter += CHUNK
+
                 get_size = LEN_HEADER_SIZE
                 full_msg = b''
                 new_msg = True
@@ -154,7 +161,7 @@ def start():
     while True:
         bytes_Address_Pair = server.recvfrom(1)  # todo: is 1 good?
         addr = bytes_Address_Pair[1]
-        print("addr: ",addr)
+        print("addr: ", addr)
 
         # creating thread for each client so multiple clients will be able to connect simultaneously
         if addr not in clients:
