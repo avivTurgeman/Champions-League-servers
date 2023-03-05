@@ -6,6 +6,7 @@ from PL_player import PL_player
 import query_object
 
 # defines
+protocol = "TCP"
 HEADERSIZE = 8
 PORT = 5057
 FORMAT = 'utf-8'  # the format that the messages decode/encode
@@ -14,17 +15,20 @@ SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the com
 ADDR = (SERVER, PORT)
 
 # socket
-try:
-    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client.connect(ADDR)
-except ConnectionRefusedError as error:
-    print("U SHOULD RUN THE SERVER FIRST")
-    print(error)
-else:
-    print("Connection established")
+if protocol == "TCP":
+    try:
+        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        client.connect(ADDR)
+    except ConnectionRefusedError as error:
+        print("U SHOULD RUN THE SERVER FIRST")
+        print(error)
+    else:
+        print("Connection established")
+
+# init
 pygame.init()
 pygame.font.init()
-fonts = pygame.font.get_fonts()
+
 
 titles = ["Name", "Rating", "Team", "Position", "Goals", "Assists"]
 
@@ -69,6 +73,8 @@ welcome_text1 = "Champions League"
 aviv = "Aviv Turgeman - 208007351"
 alon = "Alon Suissa - 211344015"
 
+# fonts
+fonts = pygame.font.get_fonts()
 big_font = pygame.font.Font('freesansbold.ttf', 100)
 med_font = pygame.font.Font('freesansbold.ttf', 60)
 special_small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
@@ -115,7 +121,7 @@ class button:
         global run
         if self.name == "chart":
             full_q = [query_object.query_obj("full")]
-            send(full_q)
+            send_queries(full_q)
             run = True
         if self.name == "queries":
             queries_categories()
@@ -370,7 +376,7 @@ class send_button(button):
         send_queries(queries_to_send)
 
 
-def send(queries_l: list):
+def tcp_send(queries_l: list):
     global run
     #  sending queries
     to_send = pickle.dumps(queries_l)
@@ -398,7 +404,10 @@ def send(queries_l: list):
 
 
 def send_queries(queries_to_send: list):
-    send(queries_to_send)
+    if protocol == "TCP":
+        tcp_send(queries_to_send)
+    if protocol == "UDP":
+        pass
 
 
 def queries_draw(buttons: list[button]):
@@ -409,7 +418,10 @@ def queries_draw(buttons: list[button]):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                send(DISCONNECT_MESSAGE)
+                if protocol == "TCP":
+                    tcp_send(DISCONNECT_MESSAGE)
+                if protocol == "UDP":
+                    pass
                 pygame.quit()
                 quit()
 
