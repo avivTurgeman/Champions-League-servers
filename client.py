@@ -6,29 +6,40 @@ from PL_player import PL_player
 import query_object
 
 # defines
-protocol = "TCP"
-HEADERSIZE = 8
-PORT = 5057
+protocol = "UDP"
+LEN_HEADER_SIZE = 8
+SERVER_PORT = 5080
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
-SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (SERVER, PORT)
+SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+SERVER_ADDR = (SERVER_IP, SERVER_PORT)
 
 # socket
 if protocol == "TCP":
     try:
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(ADDR)
+        client.connect(SERVER_ADDR)
     except ConnectionRefusedError as error:
         print("U SHOULD RUN THE SERVER FIRST")
         print(error)
     else:
         print("Connection established")
+elif protocol == "UDP":
+    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
+    client.bind((socket.gethostbyname(socket.gethostname()), 5052))  # binding the address
+
+    # sending start message
+
+    print(f'sending start message')
+    client.sendto(str.encode(' '), SERVER_ADDR)
+
+    # recv start massage and change the address
+    temp_pair = client.recvfrom(1)
+    SERVER_ADDR = temp_pair[1]
 
 # init
 pygame.init()
 pygame.font.init()
-
 
 titles = ["Name", "Rating", "Team", "Position", "Goals", "Assists"]
 
@@ -380,25 +391,53 @@ def tcp_send(queries_l: list):
     global run
     #  sending queries
     to_send = pickle.dumps(queries_l)
-    to_send = bytes(f'{len(to_send) :< {HEADERSIZE}}', FORMAT) + to_send
+    to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
     client.send(to_send)
 
     # receive answer
     new_msg = True
     answer = b''
     msg_len = 0
-    get_size = HEADERSIZE
+    get_size = LEN_HEADER_SIZE
     while True:
         msg = client.recv(get_size)
         if new_msg:
-            msg_len = int(msg[:HEADERSIZE])
+            msg_len = int(msg[:LEN_HEADER_SIZE])
             new_msg = False
-            get_size = 64
+            get_size = 1024
         else:
             answer += msg
         if len(answer) == msg_len:
             answer = pickle.loads(answer)
             break
+    chart(answer)
+    run = True
+
+
+def udp_send(queries_l: list):
+    global SERVER_ADDR, run
+
+    # sending the queries
+    to_send = pickle.dumps(queries_l)
+    to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
+    client.sendto(to_send, SERVER_ADDR)
+
+    # receive answer
+    new_msg = True
+    answer = b''
+    msg_len = 0
+    get_size = LEN_HEADER_SIZE
+    while True:
+        msg = client.recvfrom(get_size)[0]
+        if new_msg:
+            msg_len = int(msg[:LEN_HEADER_SIZE])
+            new_msg = False
+            get_size = 1024
+        else:
+            answer += msg
+            if len(answer) == msg_len:
+                answer = pickle.loads(answer)
+                break
     chart(answer)
     run = True
 
@@ -673,9 +712,12 @@ def _quit():
     print("SENDING EXIT MESSAGE")
 
     to_send = pickle.dumps(DISCONNECT_MESSAGE)
-    to_send = bytes(f'{len(to_send) :< {HEADERSIZE}}', FORMAT) + to_send
-    client.send(to_send)
-
+    if protocol == "TCP":
+        to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
+        client.send(to_send)
+    if protocol == "UDP":
+        client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT),SERVER_ADDR)
+        client.sendto(to_send, SERVER_ADDR)
     print("EXITING...")
     pygame.quit()
     quit()

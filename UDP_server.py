@@ -86,24 +86,39 @@ data = [
 ]
 
 LEN_HEADER_SIZE = 8
-PORT = 5057
-SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (SERVER, PORT)
+PORT = 5080
+SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 
-server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
+server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
+clients = []  # todo: synchronized
+PORT_CHANGE = 1  # todo: synchronized
 
 
-def handle_client(conn, addr):
+def handle_client(ip,port):
+    addr = (ip,port)
     print(f"new connection with {addr} ")
     full_msg = b''
     connected = True
     new_msg = True
     msg_len = 0
     get_size = LEN_HEADER_SIZE
+
+    # creating new socket for this client
+    current_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    current_port = PORT + PORT_CHANGE
+    # todo: port_change++ synchronized
+    current_addr = (SERVER_IP, current_port)
+    current_sock.bind(current_addr)
+
+    # sending the message for the client to know the new port
+    start_msg = bytes(' ', FORMAT)
+    current_sock.sendto(start_msg, addr)
+
     while connected:
-        msg = conn.recv(get_size)
+        msg = current_sock.recvfrom(get_size)[0]
         if msg:
             if new_msg:
                 msg_len = int(msg[:LEN_HEADER_SIZE])  # converting the length to int
@@ -119,6 +134,7 @@ def handle_client(conn, addr):
                 full_msg = pickle.loads(full_msg)
                 if full_msg != [] and full_msg[0].is_exit():
                     print("disconnecting from", addr)
+                    clients.remove(addr)  # todo: synchronized
                     break
                 answer = filter_by_queries(full_msg)
                 answer = pickle.dumps(answer)
@@ -126,23 +142,27 @@ def handle_client(conn, addr):
                 # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
                 answer = bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT) + answer
                 print("sending response", end="\n\n")
-                conn.send(answer)
+                current_sock.sendto(answer, addr)
                 get_size = LEN_HEADER_SIZE
                 full_msg = b''
                 new_msg = True
-    conn.close()
 
 
 def start():
-    print("server is starting...")
-    server.listen(5)  # todo: 5?
-    print(f"Server is listening on {SERVER}")
+    print(f"UDP server is listening on {SERVER_IP}")
+    print("One should send start message before sending data!")
     while True:
-        conn, addr = server.accept()  # while accepting new client - receiving socket,address
+        bytes_Address_Pair = server.recvfrom(1)  # todo: is 1 good?
+        addr = bytes_Address_Pair[1]
+        print("addr: ",addr)
 
         # creating thread for each client so multiple clients will be able to connect simultaneously
-        thread = threading.Thread(target=handle_client, args=(conn, addr))
-        thread.start()
+        if addr not in clients:
+            print("2")
+            clients.insert(0, addr)
+            thread = threading.Thread(target=handle_client, args=(addr))
+            print("3")
+            thread.start()
 
 
 def filter_by_queries(queries: list[query_object.query_obj]) -> list[PL_player]:
