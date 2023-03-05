@@ -86,7 +86,7 @@ data = [
 ]
 
 LEN_HEADER_SIZE = 8
-PORT = 5080
+PORT = 5090
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
@@ -112,6 +112,8 @@ def handle_client(ip, port):
     current_port = PORT + PORT_CHANGE
     # todo: port_change++ synchronized
     current_addr = (SERVER_IP, current_port)
+
+    current_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     current_sock.bind(current_addr)
 
     # sending the message for the client to know the new port
@@ -144,7 +146,7 @@ def handle_client(ip, port):
                 current_sock.sendto(bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT), addr)
                 print("sending response", end="\n\n")
 
-                # current_sock.sendto(answer, addr) todo: delete this line
+                # sending answer
                 counter = 0
                 while counter <= len(answer):
                     current_sock.sendto(answer[counter:counter + CHUNK], addr)
@@ -159,16 +161,17 @@ def start():
     print(f"UDP server is listening on {SERVER_IP}")
     print("One should send start message before sending data!")
     while True:
-        bytes_Address_Pair = server.recvfrom(1)  # todo: is 1 good?
+        bytes_Address_Pair = server.recvfrom(1)
         addr = bytes_Address_Pair[1]
-        print("addr: ", addr)
 
         # creating thread for each client so multiple clients will be able to connect simultaneously
         if addr not in clients:
-            print("2")
             clients.insert(0, addr)
             thread = threading.Thread(target=handle_client, args=(addr))
-            print("3")
+            print("My clients right now:", end="[ ")
+            for x in clients:
+                print(x, end=", ")
+            print("]")
             thread.start()
 
 

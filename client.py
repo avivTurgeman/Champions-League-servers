@@ -8,35 +8,13 @@ import query_object
 # defines
 protocol = "UDP"
 LEN_HEADER_SIZE = 8
-SERVER_PORT = 5080
+SERVER_PORT = 5090
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 SERVER_ADDR = (SERVER_IP, SERVER_PORT)
 CHUNK = 1024
-
-# socket
-if protocol == "TCP":
-    try:
-        client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        client.connect(SERVER_ADDR)
-    except ConnectionRefusedError as error:
-        print("U SHOULD RUN THE SERVER FIRST")
-        print(error)
-    else:
-        print("Connection established")
-elif protocol == "UDP":
-    client = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
-    client.bind((socket.gethostbyname(socket.gethostname()), 5052))  # binding the address
-
-    # sending start message
-
-    print(f'sending start message')
-    client.sendto(str.encode(' '), SERVER_ADDR)
-
-    # recv start massage and change the address
-    temp_pair = client.recvfrom(1)
-    SERVER_ADDR = temp_pair[1]
+CLIENT = 1
 
 # init
 pygame.init()
@@ -142,6 +120,13 @@ class button:
             run = False
         if self.name == "exit":
             _quit()
+        if self.name == "UDP" or self.name == "TCP":
+            global protocol
+            print(protocol, "->", end=" ")
+            protocol = self.name
+            print(protocol)
+            connect_to_socket()
+            start_screen()
 
     def is_clicked(self):
         click = self.clicked
@@ -393,7 +378,7 @@ def tcp_send(queries_l: list):
     #  sending queries
     to_send = pickle.dumps(queries_l)
     to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
-    client.send(to_send)
+    CLIENT.send(to_send)
 
     # receive answer
     new_msg = True
@@ -401,7 +386,7 @@ def tcp_send(queries_l: list):
     msg_len = 0
     get_size = LEN_HEADER_SIZE
     while True:
-        msg = client.recv(get_size)
+        msg = CLIENT.recv(get_size)
         if new_msg:
             msg_len = int(msg[:LEN_HEADER_SIZE])
             new_msg = False
@@ -420,10 +405,10 @@ def udp_send(queries_l: list):
 
     # sending the length and the queries
     to_send = pickle.dumps(queries_l)
-    client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
+    CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
     counter = 0
     while counter <= len(to_send):
-        client.sendto(to_send[counter:counter + CHUNK], SERVER_ADDR)
+        CLIENT.sendto(to_send[counter:counter + CHUNK], SERVER_ADDR)
         counter += CHUNK
 
     # receive answer
@@ -432,7 +417,7 @@ def udp_send(queries_l: list):
     msg_len = 0
     get_size = LEN_HEADER_SIZE
     while True:
-        msg = client.recvfrom(get_size)[0]
+        msg = CLIENT.recvfrom(get_size)[0]
         if new_msg:
             msg_len = int(msg[:LEN_HEADER_SIZE])
             new_msg = False
@@ -509,6 +494,83 @@ back_button = button(screen, "back", 8, 8, 100, 50, "back", pink, light_pink)
 exit_button = button(screen, "exit", screen_w - 8 - 100, 8, 100, 50, "exit", pink, light_pink)
 
 run = True
+
+
+def intro():
+    udp_button = button(screen, "UDP", 50, 450, 120, 70, "UDP", blue, light_blue)
+    tcp_button = button(screen, "TCP", 50 + 200, 450, 120, 70, "TCP", blue, light_blue)
+    global run, welcome_text1
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                _quit()
+
+        # background
+        intro_background_img = pygame.image.load(background_img)
+        img = pygame.transform.scale(intro_background_img, (screen_w, screen_h))
+        screen.blit(img, (0, 0))
+
+        # text
+        txt = welcome_text1
+        txt = med_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.topleft = (50, screen_h / 6 - 50)
+        screen.blit(txt, rect1.topleft)
+
+        sql_text = "Players SQL"
+        sql_text = med_font.render(sql_text, True, text_color)
+        screen.blit(sql_text, (50, screen_h / 6 + 50))
+
+        txt = aviv
+        txt = special_small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.topleft = (50, screen_h / 6 + 150)
+        screen.blit(txt, rect1.topleft)
+
+        txt = alon
+        txt = special_small_font.render(txt, True, text_color)
+        rect1 = txt.get_rect()
+        rect1.topleft = (50, screen_h / 6 + 250)
+        screen.blit(txt, rect1.topleft)
+
+        # buttons
+        pygame.mouse.set_cursor(pygame.SYSTEM_CURSOR_ARROW)
+        udp_button.draw()
+        tcp_button.draw()
+        exit_button.draw()
+
+        pygame.display.update()
+        clock.tick(fps)
+
+
+def connect_to_socket():
+    global SERVER_ADDR, CLIENT,SERVER_PORT
+    # socket
+    if protocol == "TCP":
+        try:
+            SERVER_PORT = 5050
+            SERVER_ADDR = (SERVER_IP,SERVER_PORT)
+            CLIENT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            CLIENT.connect(SERVER_ADDR)
+        except ConnectionRefusedError as error:
+            print("U SHOULD RUN THE SERVER FIRST")
+            print(error)
+        else:
+            print("TCP connection established")
+    elif protocol == "UDP":
+        CLIENT = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
+        CLIENT.bind((socket.gethostbyname(socket.gethostname()), 5052))  # binding the address
+
+        # sending start message
+
+        print(f'sending start message')
+        CLIENT.sendto(str.encode(' '), SERVER_ADDR)
+
+        # recv start massage and change the address
+        temp_pair = CLIENT.recvfrom(1)
+        SERVER_ADDR = temp_pair[1]
+        print("UDP connection established")
 
 
 def start_screen():
@@ -718,13 +780,14 @@ def _quit():
     to_send = pickle.dumps(DISCONNECT_MESSAGE)
     if protocol == "TCP":
         to_send = bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT) + to_send
-        client.send(to_send)
+        CLIENT.send(to_send)
     if protocol == "UDP":
-        client.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
-        client.sendto(to_send, SERVER_ADDR)
+        CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_HEADER_SIZE}}', FORMAT), SERVER_ADDR)
+        CLIENT.sendto(to_send, SERVER_ADDR)
     print("EXITING...")
     pygame.quit()
     quit()
 
 
-start_screen()
+# start_screen()
+intro()

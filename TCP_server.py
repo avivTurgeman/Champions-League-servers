@@ -86,7 +86,7 @@ data = [
 ]
 
 LEN_HEADER_SIZE = 8
-PORT = 5057
+PORT = 5050
 SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
