@@ -40,6 +40,7 @@ def send_with_cc(cur_sock, addr, msg):
                 if state[k] == 0:
                     cur_sock.sendto(chunks[k], addr)
                     timestemps[k] = time.time()
+                    state[k] = 1
         # recv acks -for every ack (1) increase window (2)move window (3) mark as true
         for _ in range(window_size):
             try:
@@ -51,7 +52,9 @@ def send_with_cc(cur_sock, addr, msg):
                     dup_ack[0] = ack
                     dup_ack[1] = 0
                 if dup_ack[1] >= dup_limit:  # LATENCY!
+                    print("LATENCY!")
                     print("dup_ack [", dup_ack[0], dup_ack[1], "]")
+                    dup_ack[1] = 0
                     window_size = max(int(window_size / 2), 1)
                     cur_sock.sendto(chunks[ack], addr)
                 else:
@@ -75,6 +78,7 @@ def send_with_cc(cur_sock, addr, msg):
             if k < len(state):
                 if state[k] == 1:
                     if time.time() - timestemps[k] >= time_limit:  # TIMEOUT!
+                        print("TIMEOUT!")
                         window_size = 1
 
         if state[-1] == 2:
@@ -127,6 +131,6 @@ def receive(cur_sock, addr) -> list:
             for chunk in chunks:
                 full_msg += chunk[LEN_SIZE_HEADER + LEN_INDEX_HEADER:]
             print("full:", full_msg)
-            full_msg = pickle.loads(full_msg)  # todo: fix pickles- couldn't unpickle
+            full_msg = pickle.loads(full_msg)
             print("full 2:", full_msg)
             return full_msg

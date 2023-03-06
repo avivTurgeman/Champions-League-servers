@@ -29,7 +29,7 @@ icon = pygame.image.load('sql_icon.png')
 pygame.display.set_icon(icon)
 
 # sound
-mixer.music.set_volume(0.5)
+mixer.music.set_volume(0.3)
 mixer.music.load('background_Sound.mp3')
 mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
@@ -78,8 +78,6 @@ chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 18)
 
 pygame.display.set_caption("SQL project")
 
-
-# background_img = pygame.image.load("background_leve1.png")
 
 class button:
     def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple,
@@ -810,9 +808,6 @@ def chart(table):
         elif up:
             delta_y -= scroll_speed
         # background
-        # into_background_img = pygame.image.load(background_img)
-        # img = pygame.transform.scale(into_background_img, (screen_w, screen_h))
-        # screen.blit(img, (0, 0))
         screen.fill(background_color)
 
         # chart
