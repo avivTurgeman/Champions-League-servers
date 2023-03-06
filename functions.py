@@ -100,8 +100,8 @@ def receive(cur_sock, addr) -> list:
     while True:
         msg = 0
         msg = cur_sock.recvfrom(get_size)[0]
+        print("msg:", msg)
         if msg:
-            print("msg:", msg)
             msg_len = int(msg[:LEN_SIZE_HEADER])
             index = int(msg[LEN_SIZE_HEADER:LEN_INDEX_HEADER + LEN_SIZE_HEADER])
 
@@ -120,13 +120,13 @@ def receive(cur_sock, addr) -> list:
         # DONE
         if bytes_received >= msg_len:
             # sort chunks by index
-            chunks = sorted(chunks, key=lambda chunk_: chunk_[LEN_SIZE_HEADER:LEN_INDEX_HEADER + LEN_SIZE_HEADER])
+            chunks = sorted(chunks, key=lambda chunk_: int(chunk_[LEN_SIZE_HEADER:LEN_INDEX_HEADER + LEN_SIZE_HEADER]))
             print("chunks 2", chunks)
             # combine chunks
             full_msg = b''
             for chunk in chunks:
                 full_msg += chunk[LEN_SIZE_HEADER + LEN_INDEX_HEADER:]
             print("full:", full_msg)
-            full_msg = pickle.loads(full_msg)
+            full_msg = pickle.loads(full_msg)  # todo: fix pickles- couldn't unpickle
             print("full 2:", full_msg)
             return full_msg
