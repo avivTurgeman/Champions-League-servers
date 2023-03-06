@@ -1,4 +1,4 @@
-import PL_player
+from PL_player import PL_player
 
 # [name,rating,Team, position, goals, assists]
 data = [
