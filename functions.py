@@ -11,7 +11,7 @@ CHUNK = 128
 
 
 def send_with_cc(cur_sock, addr, msg):
-    # msg = pickle.dumps(msg)
+    msg = pickle.dumps(msg)
     window_size = 1
     window_index = 0
     time_limit = 5

@@ -406,14 +406,11 @@ def tcp_send(queries_l: list):
 def udp_send(queries_l: list):
     global run
 
-    # the queries
-    to_send = pickle.dumps(queries_l)
-    functions.send_with_cc(CLIENT, SERVER_ADDR, to_send)
-    print("sent")
+    # sending the queries
+    functions.send_with_cc(CLIENT, SERVER_ADDR, queries_l)
 
     # receive answer
     answer = functions.receive(CLIENT, SERVER_ADDR)
-    print("got ans")
 
     chart(answer)
     run = True
@@ -834,13 +831,12 @@ def chart(table):
 def _quit():
     print("SENDING EXIT MESSAGE")
 
-    to_send = pickle.dumps(DISCONNECT_MESSAGE)
     if protocol == "TCP":
+        to_send = pickle.dumps(DISCONNECT_MESSAGE)
         to_send = bytes(f'{len(to_send) :< {LEN_SIZE_HEADER}}', FORMAT) + to_send
         CLIENT.send(to_send)
     if protocol == "UDP":
-        CLIENT.sendto(bytes(f'{len(to_send) :< {LEN_SIZE_HEADER}}', FORMAT), SERVER_ADDR)
-        CLIENT.sendto(to_send, SERVER_ADDR)
+        functions.send_with_cc(CLIENT, SERVER_ADDR, DISCONNECT_MESSAGE)
     print("EXITING...")
     pygame.quit()
     quit()

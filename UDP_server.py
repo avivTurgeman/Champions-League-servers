@@ -1,6 +1,5 @@
 import socket
 import threading
-import pickle
 from PL_player import PL_player
 import query_object
 import functions
@@ -130,13 +129,8 @@ def handle_client(ip, port):
             break
 
         answer = filter_by_queries(full_msg)
-        answer = pickle.dumps(answer)
-        # :< fill (pad) all the header
-        # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
 
-        # current_sock.sendto(bytes(f'{len(answer) :< {LEN_SIZE_HEADER}}', FORMAT), addr)
         print("sending response", end="\n\n")
-
         # sending answer
         functions.send_with_cc(current_sock, addr, answer)
         full_msg = b''
