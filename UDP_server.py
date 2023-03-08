@@ -5,9 +5,8 @@ import query_object
 import functions
 import DATA
 
-LEN_SIZE_HEADER = 8
-LEN_INDEX_HEADER = 8
-PORT = 6060
+
+PORT = 30015
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode

@@ -1,17 +1,22 @@
-# [name,rating,Team, position, goals, assissts]
 import socket
-import threading
 import pickle
-from PL_player import PL_player
-import query_object
-import DATA
+import threading
 
-LEN_HEADER_SIZE = 8
-PORT = 30015
-SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (SERVER, PORT)
+DHCP_PORT = 4836
+DNS_PORT = 5040
+CLIENT_PORT = 20351  # (for UDP)
+data_for_client = [(socket.gethostbyname(socket.gethostname()), CLIENT_PORT),
+                   (socket.gethostbyname(socket.gethostname()), DNS_PORT)]
+
+data_for_client = pickle.dumps(data_for_client)
+
+DHCP_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+ADDR = (DHCP_IP, DHCP_PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
+LEN_HEADER_SIZE = 8
+DISCONNECT_MESSAGE_DHCP = "EXIT"
+CONNECTION_MESSAGE = "PLEASE CONNECT ME"
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
 server.bind(ADDR)  # binding the address
@@ -39,16 +44,16 @@ def handle_client(conn, addr):
                 print("full message received!")
                 print("processing request...")
                 full_msg = pickle.loads(full_msg)
-                if full_msg != [] and full_msg[0].is_exit():
+
+                if full_msg == DISCONNECT_MESSAGE_DHCP:
                     print("disconnecting from", addr)
                     break
-                answer = filter_by_queries(full_msg)
-                answer = pickle.dumps(answer)
-                # :< fill (pad) all the header
-                # (because can be case that the header is 8  and the len pf answer is 1000 so 4 characters missed)
-                answer = bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT) + answer
-                print("sending response", end="\n\n")
-                conn.send(answer)
+
+                if full_msg == CONNECTION_MESSAGE:
+                    answer = bytes(f'{len(data_for_client) :< {LEN_HEADER_SIZE}}', FORMAT) + data_for_client
+                    print("sending response", end="\n\n")
+                    conn.send(answer)
+
                 get_size = LEN_HEADER_SIZE
                 full_msg = b''
                 new_msg = True
@@ -56,7 +61,7 @@ def handle_client(conn, addr):
 
 
 def start():
-    print("server is starting...")
+    print("DHCP server is starting...")
     server.listen(5)  # todo: 5?
     print(f"Server is listening on {ADDR}")
     while True:
@@ -65,13 +70,6 @@ def start():
         # creating thread for each client so multiple clients will be able to connect simultaneously
         thread = threading.Thread(target=handle_client, args=(conn, addr))
         thread.start()
-
-
-def filter_by_queries(queries: list[query_object.query_obj]) -> list[PL_player]:
-    filtered_data = DATA.data
-    for q in queries:
-        filtered_data = q.do_query(filtered_data)
-    return filtered_data
 
 
 start()

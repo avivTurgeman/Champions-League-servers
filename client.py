@@ -9,13 +9,17 @@ import functions
 # defines
 protocol = "UDP"
 LEN_SIZE_HEADER = 8
-LEN_INDEX_HEADER = 8
-SERVER_PORT = 6060
+SERVER_PORT = 30015
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
+DISCONNECT_MESSAGE_DHCP = "EXIT"
+CONNECTION_MESSAGE = "PLEASE CONNECT ME"
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+DHCP_IP = socket.gethostbyname(socket.gethostname())
+DHCP_PORT = 4836
 SERVER_ADDR = (SERVER_IP, SERVER_PORT)
-CHUNK = 128
+CHUNK = 32
+CLIENT_PORT = 20351  # (for UDP)
 CLIENT = 1
 
 # init
@@ -414,75 +418,6 @@ def udp_send(queries_l: list):
     run = True
 
 
-# def send_with_cc_udp(cur_sock, addr, msg):
-#     window_size = 1
-#     window_index = 0
-#     time_limit = 5
-#     # turning the socket to non-blocking
-#     cur_sock.setblocking(0)
-#
-#     bytes_rec = 0
-#     index = 0
-#     chunks = []
-#     while bytes_rec <= len(msg):
-#         chunks.insert(0, bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) +
-#                       bytes(f'{index :< {LEN_INDEX_HEADER}}', FORMAT) + msg[bytes_rec:bytes_rec + CHUNK])
-#         index += 1
-#         bytes_rec += CHUNK
-#     chunks.reverse()
-#
-#     state = [0 for _ in chunks]
-#     timestemps = [0.0 for _ in chunks]
-#     dup_ack = [-1, 0]  # [ack index , ack counter]
-#     while True:
-#         # send window and update timestemp
-#         for i in range(window_index, window_index + window_size):
-#             if state[i] == 0:
-#                 cur_sock.sendto(chunks[i], addr)
-#                 timestemps[i] = time.time()
-#         # recv acks -for every ack (1) increase window (2)move window (3) mark as true
-#         for _ in range(window_size):
-#             try:
-#                 ack = cur_sock.recvfrom(4)[0]
-#                 ack = int(ack)
-#                 if ack == dup_ack[0]:
-#                     dup_ack[1] += 1
-#                 else:
-#                     dup_ack[0] = ack
-#                     dup_ack[1] = 0
-#                 if dup_ack[1] >= 3:  # LATENCY!
-#                     window_size /= 2
-#                     cur_sock.sendto(chunks[ack], addr)
-#                 else:
-#                     for i in range(window_index, ack + 1):
-#                         if state[i] != 2:
-#                             state[i] = 2
-#                             window_size = increase_window(window_size)
-#
-#                     while state[window_index] == 2:
-#                         window_index += 1
-#
-#             except socket.error as e:
-#                 continue
-#
-#         # check timers
-#         for i in range(window_index, window_index + window_size):
-#             if state[i] == 1:
-#                 if time.time() - timestemps[i] >= time_limit:  # TIMEOUT!
-#                     window_size = 1
-#
-#         if state[-1] == 2:
-#             cur_sock.setblocking(1)
-#             break
-#
-#
-# def increase_window(window_size):
-#     if window_size < 16:
-#         return window_size * 2
-#     else:
-#         window_size += 1
-
-
 def send_queries(queries_to_send: list):
     if protocol == "TCP":
         tcp_send(queries_to_send)
@@ -596,23 +531,69 @@ def intro():
         clock.tick(fps)
 
 
+def dhcp_connection():
+    try:
+        # connection
+        DHCP_ADDR = (DHCP_IP, DHCP_PORT)
+        dhcp_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        dhcp_sock.connect(DHCP_ADDR)
+
+        # request
+        print("sending request to the DHCP SERVER")
+        msg = pickle.dumps(CONNECTION_MESSAGE)
+        msg = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) + msg
+        dhcp_sock.send(msg)
+
+        # receive answer
+        new_msg = True
+        answer = b''
+        msg_len = 0
+        get_size = LEN_SIZE_HEADER
+        while True:
+            msg = dhcp_sock.recv(get_size)
+            if new_msg:
+                msg_len = int(msg[:LEN_SIZE_HEADER])
+                new_msg = False
+                get_size = CHUNK
+            else:
+                answer += msg
+            if len(answer) == msg_len:
+                answer = pickle.loads(answer)
+                break
+
+        port = answer[0][1]
+        print("answer:", answer)
+        print("my port:", port, end="\n\n")
+
+        # close connection
+        msg = pickle.dumps(DISCONNECT_MESSAGE_DHCP)
+        msg = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) + msg
+        dhcp_sock.send(msg)
+        return port
+    except ConnectionRefusedError as error:
+        print("U SHOULD RUN THE DHCP SERVER FIRST")
+        print(error)
+
+
 def connect_to_socket():
-    global SERVER_ADDR, CLIENT, SERVER_PORT
+    global SERVER_ADDR, CLIENT, SERVER_PORT, CLIENT_PORT
+    # dhcp connection
+    CLIENT_PORT = dhcp_connection()
+
     # socket
     if protocol == "TCP":
         try:
-            SERVER_PORT = 5050
             SERVER_ADDR = (SERVER_IP, SERVER_PORT)
             CLIENT = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             CLIENT.connect(SERVER_ADDR)
         except ConnectionRefusedError as error:
-            print("U SHOULD RUN THE SERVER FIRST")
+            print("U SHOULD RUN THE TCP SERVER FIRST")
             print(error)
         else:
             print("TCP connection established")
     elif protocol == "UDP":
         CLIENT = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
-        CLIENT.bind((socket.gethostbyname(socket.gethostname()), 5052))  # binding the address
+        CLIENT.bind((socket.gethostbyname(socket.gethostname()), CLIENT_PORT))  # binding the address
 
         # sending start message
 
@@ -837,5 +818,4 @@ def _quit():
     quit()
 
 
-# start_screen()
 intro()
