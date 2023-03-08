@@ -2,7 +2,6 @@ import pickle
 import socket
 import time
 
-
 LEN_SIZE_HEADER = 8
 LEN_INDEX_HEADER = 8
 ACK_SIZE = 8
@@ -134,3 +133,11 @@ def receive(cur_sock, addr) -> list:
             full_msg = pickle.loads(full_msg)
             print("full 2:", full_msg)
             return full_msg
+
+
+def checksum(x):
+    sum_ = 0
+    for i in x:
+        sum_ += i
+    sum_ /= 8
+    return int(sum_)
