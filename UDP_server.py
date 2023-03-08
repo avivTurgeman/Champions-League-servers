@@ -1,10 +1,11 @@
+import pickle
 import socket
 import threading
+import time
 from PL_player import PL_player
 import query_object
 import functions
 import DATA
-
 
 PORT = 30015
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
@@ -22,12 +23,12 @@ clients_lock = threading.Lock()
 
 def handle_client(ip, port):
     addr = (ip, port)
-    print(f"\nnew connection with {addr} ",end="\n\n")
+    print(f"\nnew connection with {addr} ", end="\n\n")
     full_msg = b''
 
     # creating new socket for this client
     current_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    current_port = get_change_port()
+    current_port = get_change_port() + PORT
     current_addr = (SERVER_IP, current_port)
 
     # free the port right after disconnecting
@@ -35,8 +36,37 @@ def handle_client(ip, port):
     current_sock.bind(current_addr)
 
     # sending the message for the client to know the new port
-    start_msg = bytes(' ', FORMAT)
-    current_sock.sendto(start_msg, addr)
+    flag = 1
+    current_sock.setblocking(False)
+    current_sock.settimeout(0.3)
+    while flag:
+        if flag == 1:
+            # syn ack
+            print("sending SYN-ACK")
+            start_msg = pickle.dumps("ack")
+            current_sock.sendto(start_msg, addr)
+            flag = 2
+
+        if flag == 2:
+            msg = 0
+            try:
+                if msg == 0:
+                    msg = current_sock.recvfrom(100)
+            except socket.error as e:
+                print(e)
+
+            if msg != 0:
+                msg = pickle.loads(msg[0])
+                if msg == "ack":
+                    print(f'connection with {addr} established')
+                    flag = 0
+                    break
+                else:
+                    flag = 1
+            else:
+                flag = 1
+    current_sock.setblocking(True)
+    current_sock.settimeout(30.0)
 
     while True:
         full_msg = functions.receive(current_sock, addr)
@@ -63,7 +93,8 @@ def start():
     print(f"UDP server is listening on {SERVER_IP}")
     print("One should send start message before sending data!")
     while True:
-        bytes_Address_Pair = server.recvfrom(1)
+        # syn
+        bytes_Address_Pair = server.recvfrom(100)
         addr = bytes_Address_Pair[1]
 
         # creating thread for each client so multiple clients will be able to connect simultaneously

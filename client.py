@@ -1,3 +1,6 @@
+import threading
+import time
+
 import pygame
 from pygame import mixer
 import socket
@@ -577,11 +580,10 @@ def dhcp_connection():
         port = answer[0][1]
         print("answer:", answer)
         print("my port:", port, end="\n\n")
-        print("DNS address:", answer[1],end="\n\n")
+        print("DNS address:", answer[1], end="\n\n")
         CLIENT_PORT = port
         DNS_IP = answer[1][0]
         DNS_PORT = answer[1][1]
-
 
         # close connection
         msg = pickle.dumps(DISCONNECT_MESSAGE_DHCP)
@@ -623,11 +625,10 @@ def dns():
             if len(answer) == msg_len:
                 answer = pickle.loads(answer)
                 break
-        print("DNS answer:", answer)
+        print("DNS answer:", answer, end="\n\n")
         SERVER_ADDR = answer
         SERVER_IP = answer[0]
         SERVER_PORT = answer[1]
-
 
         # close connection
         msg = pickle.dumps(DISCONNECT_MESSAGE_DNS)
@@ -658,19 +659,57 @@ def connect_to_socket():
             print(error)
         else:
             print("TCP connection established")
+
     elif protocol == "UDP":
         CLIENT = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
         CLIENT.bind((socket.gethostbyname(socket.gethostname()), CLIENT_PORT))  # binding the address
 
-        # sending start message
+        flag = 1
+        temp_pair = 0
+        CLIENT.setblocking(False)
 
-        print(f'sending start message')
-        CLIENT.sendto(str.encode(' '), SERVER_ADDR)
+        while flag:
+            # sending start message (syn)
+            if flag == 1:
+                CLIENT.settimeout(0.2)
+                print(f'sending start message')
+                CLIENT.sendto(pickle.dumps("syn"), SERVER_ADDR)
+                flag = 2
 
-        # recv start massage and change the address
-        temp_pair = CLIENT.recvfrom(1)
-        SERVER_ADDR = temp_pair[1]
-        print("UDP connection established")
+            # recv start massage and change the address
+            if flag == 2:
+                temp_pair = 0
+                try:
+                    if temp_pair == 0:
+                        temp_pair = CLIENT.recvfrom(100)
+                except socket.timeout as e:
+                    pass
+                if temp_pair != 0:
+                    flag = 3
+                    SERVER_ADDR = temp_pair[1]
+                    print("!=0 case, temp pair:", temp_pair, ".")
+                else:
+                    print(" ==0 case, temp pair:", temp_pair, ".")
+                    flag = 1
+            # ack
+            if flag == 3:
+                CLIENT.sendto(pickle.dumps("ack"), SERVER_ADDR)
+                print("sent ack")
+                msg2 = 0
+                try:
+                    msg2 = CLIENT.recvfrom(1000)[0]
+                    if msg2 == 0:
+                        msg2 = pickle.loads(msg2)
+                except socket.timeout as e:
+                    pass
+
+                if msg2 == 0:
+                    flag = 0
+                else:  # if I got somthing that's mean the server still trying to complete the sync
+                    flag = 1
+        CLIENT.setblocking(True)
+        CLIENT.settimeout(30.0)
+        print("RUDP connection established")
 
 
 def start_screen():
