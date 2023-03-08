@@ -11,7 +11,7 @@ PORT = 6060
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
-CHUNK = 128
+CHUNK = 32
 
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
@@ -23,7 +23,7 @@ clients_lock = threading.Lock()
 
 def handle_client(ip, port):
     addr = (ip, port)
-    print(f"new connection with {addr} ",end="\n\n")
+    print(f"\nnew connection with {addr} ",end="\n\n")
     full_msg = b''
 
     # creating new socket for this client
