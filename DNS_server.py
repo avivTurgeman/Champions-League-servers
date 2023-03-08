@@ -2,21 +2,19 @@ import socket
 import pickle
 import threading
 
-DHCP_PORT = 4836
 DNS_PORT = 5555
-CLIENT_PORT = 20351  # (for UDP)
-data_for_client = [(socket.gethostbyname(socket.gethostname()), CLIENT_PORT),
-                   (socket.gethostbyname(socket.gethostname()), DNS_PORT)]
+SERVER_PORT = 30015
+SERVER_IP = socket.gethostbyname(socket.gethostname())
 
-data_for_client = pickle.dumps(data_for_client)
-
-DHCP_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (DHCP_IP, DHCP_PORT)
+DNS_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+ADDR = (DNS_IP, DNS_PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
 LEN_HEADER_SIZE = 8
-DISCONNECT_MESSAGE_DHCP = "EXIT"
-CONNECTION_MESSAGE = "PLEASE CONNECT ME"
+DISCONNECT_MESSAGE_DNS = "EXIT"
+
+server_addr = pickle.dumps((socket.gethostbyname(socket.gethostname()), SERVER_PORT))
+mapper = {"SERVER": server_addr}
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
 server.bind(ADDR)  # binding the address
@@ -45,15 +43,19 @@ def handle_client(conn, addr):
                 print("processing request...")
                 full_msg = pickle.loads(full_msg)
 
-                if full_msg == DISCONNECT_MESSAGE_DHCP:
+                if full_msg == DISCONNECT_MESSAGE_DNS:
                     print("disconnecting from", addr)
                     break
 
-                if full_msg == CONNECTION_MESSAGE:
-                    answer = bytes(f'{len(data_for_client) :< {LEN_HEADER_SIZE}}', FORMAT) + data_for_client
-                    print("sending response", end="\n\n")
-                    conn.send(answer)
+                # answer
+                answer = pickle.dumps("I am sorry, I couldn't find the destination address")
+                if full_msg in mapper:
+                    answer = mapper[full_msg]
+                answer = bytes(f'{len(answer) :< {LEN_HEADER_SIZE}}', FORMAT) + answer
+                print("sending response", end="\n\n")
+                conn.send(answer)
 
+                # preparing for the next message
                 get_size = LEN_HEADER_SIZE
                 full_msg = b''
                 new_msg = True
@@ -61,7 +63,7 @@ def handle_client(conn, addr):
 
 
 def start():
-    print("DHCP server is starting...")
+    print("DNS server is starting...")
     server.listen(5)  # todo: 5?
     print(f"Server is listening on {ADDR}")
     while True:

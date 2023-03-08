@@ -8,19 +8,31 @@ import functions
 
 # defines
 protocol = "UDP"
-LEN_SIZE_HEADER = 8
-SERVER_PORT = 30015
+LEN_SIZE_HEADER = 8  # for tcp
 FORMAT = 'utf-8'  # the format that the messages decode/encode
+CHUNK = 32
+
+# server defines
+SERVER_PORT = 30015
+SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+SERVER_ADDR = (SERVER_IP, SERVER_PORT)
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
+
+# client defines
+CLIENT_PORT = 20351  # (for UDP)
+CLIENT = 1  # changing later to socket (when the user will choose TCP or UDP protocol)
+
+# dhcp defines
 DISCONNECT_MESSAGE_DHCP = "EXIT"
 CONNECTION_MESSAGE = "PLEASE CONNECT ME"
-SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 DHCP_IP = socket.gethostbyname(socket.gethostname())
 DHCP_PORT = 4836
-SERVER_ADDR = (SERVER_IP, SERVER_PORT)
-CHUNK = 32
-CLIENT_PORT = 20351  # (for UDP)
-CLIENT = 1
+
+# dns defines
+DNS_IP = 1  # will change later (when we will get it from the DHCP SERVER)
+DNS_PORT = 1  # will change later (when we will get it from the DHCP SERVER)
+SERVER_ADDR_REQUEST = "SERVER"
+DISCONNECT_MESSAGE_DNS = "EXIT"
 
 # init
 pygame.init()
@@ -532,6 +544,7 @@ def intro():
 
 
 def dhcp_connection():
+    global CLIENT_PORT, DNS_PORT, DNS_IP
     try:
         # connection
         DHCP_ADDR = (DHCP_IP, DHCP_PORT)
@@ -564,21 +577,75 @@ def dhcp_connection():
         port = answer[0][1]
         print("answer:", answer)
         print("my port:", port, end="\n\n")
+        print("DNS address:", answer[1],end="\n\n")
+        CLIENT_PORT = port
+        DNS_IP = answer[1][0]
+        DNS_PORT = answer[1][1]
+
 
         # close connection
         msg = pickle.dumps(DISCONNECT_MESSAGE_DHCP)
         msg = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) + msg
         dhcp_sock.send(msg)
-        return port
+        dhcp_sock.close()
+
     except ConnectionRefusedError as error:
         print("U SHOULD RUN THE DHCP SERVER FIRST")
         print(error)
 
 
+def dns():
+    global SERVER_ADDR, SERVER_IP, SERVER_PORT
+    try:
+        # connection
+        dns_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        dns_sock.connect((DNS_IP, DNS_PORT))
+
+        # request
+        print("sending request to the DNS SERVER")
+        msg = pickle.dumps(SERVER_ADDR_REQUEST)
+        msg = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) + msg
+        dns_sock.send(msg)
+
+        # receive answer
+        new_msg = True
+        answer = b''
+        msg_len = 0
+        get_size = LEN_SIZE_HEADER
+        while True:
+            msg = dns_sock.recv(get_size)
+            if new_msg:
+                msg_len = int(msg[:LEN_SIZE_HEADER])
+                new_msg = False
+                get_size = CHUNK
+            else:
+                answer += msg
+            if len(answer) == msg_len:
+                answer = pickle.loads(answer)
+                break
+        print("DNS answer:", answer)
+        SERVER_ADDR = answer
+        SERVER_IP = answer[0]
+        SERVER_PORT = answer[1]
+
+
+        # close connection
+        msg = pickle.dumps(DISCONNECT_MESSAGE_DNS)
+        msg = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT) + msg
+        dns_sock.send(msg)
+        dns_sock.close()
+    except ConnectionRefusedError as error:
+        print("U SHOULD RUN THE DNS SERVER FIRST")
+        print(error)
+
+
 def connect_to_socket():
-    global SERVER_ADDR, CLIENT, SERVER_PORT, CLIENT_PORT
+    global SERVER_ADDR, CLIENT, SERVER_PORT
     # dhcp connection
-    CLIENT_PORT = dhcp_connection()
+    dhcp_connection()
+
+    # dns connection
+    dns()
 
     # socket
     if protocol == "TCP":
