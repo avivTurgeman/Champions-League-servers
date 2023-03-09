@@ -1,6 +1,16 @@
 from PL_player import PL_player
 
 
+def sort_answer(ans: list[PL_player], flag, reverse=True):
+    if flag == "goals":
+        return sorted(ans, key=lambda pl: pl.get_goals(), reverse=reverse)
+    if flag == "assists":
+        return sorted(ans, key=lambda pl: pl.get_assists(), reverse=reverse)
+    if flag == "rating":
+        return sorted(ans, key=lambda pl: pl.get_rate(), reverse=reverse)
+    return ans
+
+
 class query_obj:
 
     def __init__(self, query_name, is_exit=False) -> None:
@@ -8,6 +18,7 @@ class query_obj:
         self.EXIT = is_exit
 
     def do_query(self, data: list[PL_player]) -> list[PL_player]:
+        flag = "none"
         ans: list[PL_player] = []
         if self.query_name == "full":
             return data
@@ -36,14 +47,17 @@ class query_obj:
                 if p.get_team() == "Porto":
                     ans.insert(0, p)
         if self.query_name == "no goals":
+            flag = "rating"
             for p in data:
                 if p.get_goals() == 0:
                     ans.insert(0, p)
         if self.query_name == "goals >= 2":
+            flag = "goals"
             for p in data:
                 if p.get_goals() >= 2:
                     ans.insert(0, p)
         if self.query_name == "goals < 4":
+            flag = "goals"
             for p in data:
                 if p.get_goals() < 4:
                     ans.insert(0, p)
@@ -55,8 +69,8 @@ class query_obj:
                     top_scorer = p
                     max_score = p.get_goals()
             ans.insert(0, top_scorer)
-            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "top 10 scorers":
+            flag = "goals"
             top_10 = []
             for i, p in enumerate(data):
                 if i < 10:
@@ -70,8 +84,8 @@ class query_obj:
                             break
 
             ans = top_10
-            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "top 5 scorers":
+            flag = "goals"
             top_5 = []
 
             for counter, p in enumerate(data):
@@ -85,20 +99,23 @@ class query_obj:
                             top_5.insert(0, p)
                             break
             ans = top_5
-        ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "no assists":
+            flag = "rating"
             for p in data:
                 if p.get_assists() == 0:
                     ans.insert(0, p)
         if self.query_name == "assists >= 2":
+            flag = "assists"
             for p in data:
                 if p.get_assists() >= 2:
                     ans.insert(0, p)
         if self.query_name == "assists < 4":
+            flag = "assists"
             for p in data:
                 if p.get_assists() < 4:
                     ans.insert(0, p)
         if self.query_name == "top assistive":
+            flag = "assists"
             max_score = -1
             top_assistive = None
             for p in data:
@@ -120,8 +137,8 @@ class query_obj:
                             break
 
             ans = top_10
-        ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "top 5 assistive":
+            flag = "assists"
             top_5 = []
             for i, p in enumerate(data):
                 if i < 5:
@@ -135,25 +152,29 @@ class query_obj:
                             break
 
             ans = top_5
-        ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "rating > 3.5":
+            flag = "rating"
             for p in data:
                 if p.get_rate() > 3.5:
                     ans.insert(0, p)
         if self.query_name == "rating < 7.0":
+            flag = "rating"
             for p in data:
                 if p.get_rate() < 7.0:
                     ans.insert(0, p)
         if self.query_name == "rating < 6.2":
+            flag = "rating"
             for p in data:
                 if p.get_rate() < 6.2:
                     ans.insert(0, p)
         if self.query_name == "rating > 7.5":
+            flag = "rating"
             for p in data:
                 if p.get_rate() > 7.5:
                     ans.insert(0, p)
 
         if self.query_name == "top 10 rating":
+            flag = "rating"
             top_10 = []
             for i, p in enumerate(data):
                 if i < 10:
@@ -167,8 +188,8 @@ class query_obj:
                             break
 
             ans = top_10
-        ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
         if self.query_name == "top 5 rating":
+            flag = "rating"
             top_5 = []
             for i, p in enumerate(data):
                 if i < 5:
@@ -182,7 +203,6 @@ class query_obj:
                             break
 
             ans = top_5
-        ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
         if self.query_name == "Goalkeepers":
             for p in data:
                 if p.get_position() == "GK":
@@ -208,6 +228,7 @@ class query_obj:
                 if p.get_position()[0] == "R":
                     ans.insert(0, p)
 
+        ans = sort_answer(ans, flag)
         return ans
 
     def is_exit(self):
