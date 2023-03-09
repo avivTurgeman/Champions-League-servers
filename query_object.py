@@ -8,7 +8,7 @@ class query_obj:
         self.EXIT = is_exit
 
     def do_query(self, data: list[PL_player]) -> list[PL_player]:
-        ans = []
+        ans: list[PL_player] = []
         if self.query_name == "full":
             return data
         if self.query_name == "Liverpool":
@@ -84,6 +84,7 @@ class query_obj:
                             top_5.insert(0, p)
                             break
             ans = top_5
+            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "no assists":
             for p in data:
                 if p.get_assists() == 0:
@@ -118,6 +119,7 @@ class query_obj:
                             break
 
             ans = top_10
+            ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "top 5 assistive":
             top_5 = []
             for i, p in enumerate(data):
@@ -132,6 +134,7 @@ class query_obj:
                             break
 
             ans = top_5
+            ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "rating > 3.5":
             for p in data:
                 if p.get_rate() > 3.5:
@@ -163,6 +166,7 @@ class query_obj:
                             break
 
             ans = top_10
+            ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
         if self.query_name == "top 5 rating":
             top_5 = []
             for i, p in enumerate(data):
