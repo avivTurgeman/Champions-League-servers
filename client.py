@@ -199,20 +199,6 @@ class explain_button(button):
                 self.text_to_button()
 
 
-class and_or_buttons(button):
-
-    def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple, inactive_color=purple,
-                 text_color=black, text_size=35, visible=True):
-        super().__init__(surface, text, x, y, width, height, name, active_color, inactive_color, text_color, text_size,
-                         visible)
-
-    def text_to_button(self):
-        super().text_to_button()
-
-    def click(self):
-        super().click()
-
-
 class category_button(button):
 
     def __init__(self, surface, text, x, y, width, height, name, active_color=light_purple, inactive_color=purple,
