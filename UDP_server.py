@@ -25,12 +25,12 @@ def handle_client(ip, port, chunk):
     addr = (ip, port)
     print(f"\nnew connection with {addr} ", end="\n\n")
     full_msg = b''
+    flag = 1
 
     # creating new socket for this client
     current_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     current_port = get_change_port() + PORT
     current_addr = (SERVER_IP, current_port)
-    flag = 1
 
     # free the port right after disconnecting
     current_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
