@@ -13,7 +13,7 @@ CHUNK = 32
 LEN_HEADER_SIZE = 8
 DISCONNECT_MESSAGE_DNS = "EXIT"
 
-server_addr = pickle.dumps((socket.gethostbyname(socket.gethostname()), SERVER_PORT))
+server_addr = pickle.dumps((SERVER_IP, SERVER_PORT))
 mapper = {"SERVER": server_addr}
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP socket
@@ -64,7 +64,7 @@ def handle_client(conn, addr):
 
 def start():
     print("DNS server is starting...")
-    server.listen(5)  # todo: 5?
+    server.listen(5)
     print(f"Server is listening on {ADDR}")
     while True:
         conn, addr = server.accept()  # while accepting new client - receiving socket,address

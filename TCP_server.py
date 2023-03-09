@@ -57,7 +57,7 @@ def handle_client(conn, addr):
 
 def start():
     print("server is starting...")
-    server.listen(5)  # todo: 5?
+    server.listen(5)
     print(f"Server is listening on {ADDR}")
     while True:
         conn, addr = server.accept()  # while accepting new client - receiving socket,address

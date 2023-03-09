@@ -1,7 +1,6 @@
 import pickle
 import socket
 import threading
-import time
 from PL_player import PL_player
 import query_object
 import functions
