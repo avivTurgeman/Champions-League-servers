@@ -13,9 +13,6 @@ FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
 
 # server defines
-SERVER_PORT = 30015
-SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-SERVER_ADDR = (SERVER_IP, SERVER_PORT)
 DISCONNECT_MESSAGE = [query_object.query_obj("Exit", True)]
 
 # client defines
@@ -690,10 +687,8 @@ def connect_to_socket():
                 print("sent ack")
                 msg2 = 0
                 try:
-                    CLIENT.settimeout(0.2)
+                    CLIENT.settimeout(2)
                     msg2 = CLIENT.recvfrom(1000)[0]
-                    if msg2 != 0:
-                        msg2 = pickle.loads(msg2)
                 except socket.timeout as e:
                     msg2 = 0
 
@@ -915,5 +910,6 @@ def _quit():
     print("EXITING...")
     pygame.quit()
     quit()
+
 
 intro()

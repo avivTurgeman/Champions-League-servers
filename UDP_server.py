@@ -49,7 +49,7 @@ def handle_client(ip, port):
         if flag == 2:
             msg = 0
             try:
-                current_sock.settimeout(0.6)
+                current_sock.settimeout(0.18)
                 if msg == 0:
                     msg = current_sock.recvfrom(100)
             except socket.error as e:
@@ -57,7 +57,7 @@ def handle_client(ip, port):
 
             if msg != 0:
                 msg = pickle.loads(msg[0])
-                print("msg:" ,msg,"len",len(msg) )
+                print("msg:", msg, "len", len(msg))
                 if msg == "ack":
                     print(f'connection with {addr} established')
                     flag = 0
@@ -95,7 +95,7 @@ def start():
     print("One should send start message before sending data!")
     while True:
         # syn
-        bytes_Address_Pair = server.recvfrom(100)
+        bytes_Address_Pair = server.recvfrom(100)  # (data , (ip,port))
         addr = bytes_Address_Pair[1]
 
         # creating thread for each client so multiple clients will be able to connect simultaneously
