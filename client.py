@@ -48,8 +48,8 @@ icon = pygame.image.load('sql_icon.png')
 pygame.display.set_icon(icon)
 
 # sound
-mixer.music.set_volume(0.3)
-mixer.music.load('background_Sound.mp3')
+# mixer.music.set_volume(0.3)
+# mixer.music.load('background_Sound.mp3')
 mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
@@ -178,7 +178,7 @@ class explain_button(button):
                          visible)
 
     def click(self):
-        pass
+        None
 
     def draw(self):
         if self.visible:
@@ -448,12 +448,7 @@ def queries_draw(buttons: list[button]):
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                if protocol == "TCP":
-                    tcp_send(DISCONNECT_MESSAGE)
-                if protocol == "UDP":
-                    pass
-                pygame.quit()
-                quit()
+                _quit()
 
         # background
         intro_background_img = pygame.image.load(background_img)
@@ -683,7 +678,7 @@ def connect_to_socket():
                     if temp_pair == 0:
                         temp_pair = CLIENT.recvfrom(100)
                 except socket.timeout as e:
-                    pass
+                    continue
                 if temp_pair != 0:
                     flag = 3
                     SERVER_ADDR = temp_pair[1]
@@ -701,7 +696,7 @@ def connect_to_socket():
                     if msg2 == 0:
                         msg2 = pickle.loads(msg2)
                 except socket.timeout as e:
-                    pass
+                    continue
 
                 if msg2 == 0:
                     flag = 0

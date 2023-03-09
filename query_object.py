@@ -55,6 +55,7 @@ class query_obj:
                     top_scorer = p
                     max_score = p.get_goals()
             ans.insert(0, top_scorer)
+            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "top 10 scorers":
             top_10 = []
             for i, p in enumerate(data):
@@ -84,7 +85,7 @@ class query_obj:
                             top_5.insert(0, p)
                             break
             ans = top_5
-            ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
+        ans = sorted(ans, key=lambda players: players.get_goals(), reverse=True)
         if self.query_name == "no assists":
             for p in data:
                 if p.get_assists() == 0:
@@ -119,7 +120,7 @@ class query_obj:
                             break
 
             ans = top_10
-            ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
+        ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "top 5 assistive":
             top_5 = []
             for i, p in enumerate(data):
@@ -134,7 +135,7 @@ class query_obj:
                             break
 
             ans = top_5
-            ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
+        ans = sorted(ans, key=lambda players: players.get_assists(), reverse=True)
         if self.query_name == "rating > 3.5":
             for p in data:
                 if p.get_rate() > 3.5:
@@ -166,7 +167,7 @@ class query_obj:
                             break
 
             ans = top_10
-            ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
+        ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
         if self.query_name == "top 5 rating":
             top_5 = []
             for i, p in enumerate(data):
@@ -181,6 +182,7 @@ class query_obj:
                             break
 
             ans = top_5
+        ans = sorted(ans, key=lambda players: players.get_rate(), reverse=True)
         if self.query_name == "Goalkeepers":
             for p in data:
                 if p.get_position() == "GK":
