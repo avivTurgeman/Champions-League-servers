@@ -3,15 +3,17 @@ import pickle
 import threading
 
 DHCP_PORT = 4836
+DHCP_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 DNS_PORT = 5555
+DNS_IP = socket.gethostbyname(socket.gethostname())
 CLIENT_PORT = 20351  # (for UDP)
-data_for_client = [(socket.gethostbyname(socket.gethostname()), CLIENT_PORT),
-                   (socket.gethostbyname(socket.gethostname()), DNS_PORT)]
+CLIENT_IP = socket.gethostbyname(socket.gethostname())
+
+ADDR = (DHCP_IP, DHCP_PORT)
+data_for_client = [(CLIENT_IP, CLIENT_PORT), (DNS_IP, DNS_PORT)]
 
 data_for_client = pickle.dumps(data_for_client)
 
-DHCP_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (DHCP_IP, DHCP_PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
 LEN_HEADER_SIZE = 8

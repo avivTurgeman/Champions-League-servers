@@ -8,8 +8,8 @@ import DATA
 
 LEN_HEADER_SIZE = 8
 PORT = 30015
-SERVER = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
-ADDR = (SERVER, PORT)
+IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
+ADDR = (IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
 
