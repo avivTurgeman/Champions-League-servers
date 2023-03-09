@@ -30,14 +30,14 @@ def handle_client(ip, port, chunk):
     current_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     current_port = get_change_port() + PORT
     current_addr = (SERVER_IP, current_port)
+    flag = 1
 
     # free the port right after disconnecting
     current_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     current_sock.bind(current_addr)
+    current_sock.setblocking(False)
 
     # sending the message for the client to know the new port
-    flag = 1
-    current_sock.setblocking(False)
     while flag:
         if flag == 1:
             current_sock.settimeout(0.3)
