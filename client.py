@@ -50,7 +50,7 @@ pygame.display.set_icon(icon)
 # sound
 # mixer.music.set_volume(0.3)
 # mixer.music.load('background_Sound.mp3')
-mixer.music.play(-1, fade_ms=5000)
+# mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
@@ -178,7 +178,7 @@ class explain_button(button):
                          visible)
 
     def click(self):
-        None
+        pass
 
     def draw(self):
         if self.visible:
@@ -425,9 +425,11 @@ def udp_send(queries_l: list):
 
     # sending the queries
     functions.send_with_cc(CLIENT, SERVER_ADDR, queries_l)
+    print("sent q")
 
     # receive answer
     answer = functions.receive(CLIENT, SERVER_ADDR)
+    print("got response")
 
     chart(answer)
     run = True
@@ -673,12 +675,13 @@ def connect_to_socket():
 
             # recv start massage and change the address
             if flag == 2:
+                CLIENT.settimeout(0.2)
                 temp_pair = 0
                 try:
                     if temp_pair == 0:
                         temp_pair = CLIENT.recvfrom(100)
                 except socket.timeout as e:
-                    continue
+                    pass
                 if temp_pair != 0:
                     flag = 3
                     SERVER_ADDR = temp_pair[1]
@@ -692,11 +695,12 @@ def connect_to_socket():
                 print("sent ack")
                 msg2 = 0
                 try:
+                    CLIENT.settimeout(0.2)
                     msg2 = CLIENT.recvfrom(1000)[0]
-                    if msg2 == 0:
+                    if msg2 != 0:
                         msg2 = pickle.loads(msg2)
                 except socket.timeout as e:
-                    continue
+                    msg2 = 0
 
                 if msg2 == 0:
                     flag = 0
@@ -918,5 +922,6 @@ def _quit():
     pygame.quit()
     quit()
 
-
+c = pickle.dumps("ack")
+print("length:",len(c))
 intro()

@@ -38,9 +38,9 @@ def handle_client(ip, port):
     # sending the message for the client to know the new port
     flag = 1
     current_sock.setblocking(False)
-    current_sock.settimeout(0.3)
     while flag:
         if flag == 1:
+            current_sock.settimeout(0.3)
             # syn ack
             print("sending SYN-ACK")
             start_msg = pickle.dumps("ack")
@@ -50,6 +50,7 @@ def handle_client(ip, port):
         if flag == 2:
             msg = 0
             try:
+                current_sock.settimeout(0.6)
                 if msg == 0:
                     msg = current_sock.recvfrom(100)
             except socket.error as e:
@@ -57,6 +58,7 @@ def handle_client(ip, port):
 
             if msg != 0:
                 msg = pickle.loads(msg[0])
+                print("msg:" ,msg,"len",len(msg) )
                 if msg == "ack":
                     print(f'connection with {addr} established')
                     flag = 0

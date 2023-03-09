@@ -17,7 +17,7 @@ def send_with_cc(cur_sock, addr, msg):
     time_limit = 5
     dup_limit = 250
     # turning the socket to non-blocking
-    cur_sock.setblocking(0)
+    cur_sock.setblocking(False)
 
     bytes_rec = 0
     index = 0
@@ -69,7 +69,7 @@ def send_with_cc(cur_sock, addr, msg):
                             window_size = increase_window(window_size)
 
                     if state[-1] == 2:
-                        cur_sock.setblocking(1)
+                        cur_sock.setblocking(True)
                         break
 
                     while state[window_index] == 2:
@@ -87,7 +87,7 @@ def send_with_cc(cur_sock, addr, msg):
                         window_size = 1
 
         if state[-1] == 2:
-            cur_sock.setblocking(1)
+            cur_sock.setblocking(True)
             break
 
 
@@ -105,12 +105,12 @@ def receive(cur_sock, addr) -> list:
     indexes = []
     msg_len = 0
     bytes_received = 0
-    cur_sock.setblocking(1)
+    cur_sock.setblocking(True)
     while True:
         msg = 0
         msg = cur_sock.recvfrom(get_size)[0]
-        print("msg:", msg)
-        if msg:
+        print("msg:", msg , "len", len(msg))
+        if len(msg) > 25:
             data = msg[LEN_SIZE_HEADER + LEN_INDEX_HEADER: -LEN_CHECKSUM_HEADER]
             if checksum(data) == int(msg[-LEN_CHECKSUM_HEADER:]):  # is the checksum correct
                 msg_len = int(msg[:LEN_SIZE_HEADER])
