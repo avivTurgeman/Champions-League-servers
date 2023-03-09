@@ -1,6 +1,3 @@
-import threading
-import time
-
 import pygame
 from pygame import mixer
 import socket
@@ -79,6 +76,7 @@ text_color = white
 background_img = "champions_league_background2.png"
 
 screen = pygame.display.set_mode((screen_w, screen_h))
+pygame.display.set_caption("SQL project")
 
 # universal text
 welcome_text1 = "Champions League"
@@ -92,10 +90,7 @@ med_font = pygame.font.Font('freesansbold.ttf', 60)
 special_small_font = pygame.font.Font(pygame.font.match_font(fonts[14]), 50)
 regular_small_font = pygame.font.Font('freesansbold.ttf', 30)
 extra_small_font = pygame.font.Font('freesansbold.ttf', 20)
-
 chart_font = pygame.font.Font(pygame.font.match_font(fonts[8]), 18)
-
-pygame.display.set_caption("SQL project")
 
 
 class button:
@@ -812,7 +807,6 @@ def queries_categories():
 
 
 # ["name", "Rating", "Team", "position", "goals", "assists"]
-
 def print_table(data: list[PL_player], delta_y):
     matrix = [[data[i].get_name(), str(data[i].get_rate()), data[i].get_team(), data[i].get_position(),
                str(data[i].get_goals()), str(data[i].get_assists())] for i in range(len(data))]
@@ -922,6 +916,4 @@ def _quit():
     pygame.quit()
     quit()
 
-c = pickle.dumps("ack")
-print("length:",len(c))
 intro()
