@@ -11,13 +11,14 @@ SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the 
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
+PORT_CHANGE = 1
+clients = []
+
+change_port_lock = threading.Lock()
+clients_lock = threading.Lock()
 
 server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
-clients = []
-PORT_CHANGE = 1
-change_port_lock = threading.Lock()
-clients_lock = threading.Lock()
 
 
 def handle_client(ip, port):
