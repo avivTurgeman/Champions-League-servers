@@ -662,7 +662,7 @@ def connect_to_socket():
             if flag == 1:
                 CLIENT.settimeout(0.2)
                 print(f'sending start message')
-                CLIENT.sendto(pickle.dumps("syn"), SERVER_ADDR)
+                CLIENT.sendto(pickle.dumps(CHUNK), SERVER_ADDR)
                 flag = 2
 
             # recv start massage and change the address

@@ -21,7 +21,7 @@ server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
 server.bind(ADDR)  # binding the address
 
 
-def handle_client(ip, port):
+def handle_client(ip, port, chunk):
     addr = (ip, port)
     print(f"\nnew connection with {addr} ", end="\n\n")
     full_msg = b''
@@ -71,7 +71,7 @@ def handle_client(ip, port):
     current_sock.settimeout(30.0)
 
     while True:
-        full_msg = functions.receive(current_sock, addr)
+        full_msg = functions.receive(current_sock, addr, chunk)
 
         # EXIT message
         if full_msg != [] and full_msg[0].is_exit():
@@ -87,7 +87,7 @@ def handle_client(ip, port):
 
         print("sending response", end="\n\n")
         # sending answer
-        functions.send_with_cc(current_sock, addr, answer)
+        functions.send_with_cc(current_sock, addr, answer, chunk)
         full_msg = b''
 
 
@@ -98,11 +98,12 @@ def start():
         # syn
         bytes_Address_Pair = server.recvfrom(100)  # (data , (ip,port))
         addr = bytes_Address_Pair[1]
+        chunk = pickle.loads(bytes_Address_Pair[0])
 
         # creating thread for each client so multiple clients will be able to connect simultaneously
         if addr not in clients:
             add_client(addr)
-            thread = threading.Thread(target=handle_client, args=(addr))
+            thread = threading.Thread(target=handle_client, args=(addr[0], addr[1], chunk))
             print("My clients right now:", end="[ ")
             for x in clients:
                 print(x, end=", ")

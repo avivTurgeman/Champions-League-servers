@@ -10,7 +10,7 @@ FORMAT = 'utf-8'  # the format that the messages decode/encode
 CHUNK = 32
 
 
-def send_with_cc(cur_sock, addr, msg):
+def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
     msg = pickle.dumps(msg)
     window_size = 1
     window_index = 0
@@ -25,14 +25,14 @@ def send_with_cc(cur_sock, addr, msg):
     while bytes_rec <= len(msg):
         size = bytes(f'{len(msg) :< {LEN_SIZE_HEADER}}', FORMAT)
         chunk_index = bytes(f'{index :< {LEN_INDEX_HEADER}}', FORMAT)
-        data = msg[bytes_rec:bytes_rec + CHUNK]
+        data = msg[bytes_rec:bytes_rec + chunk]
         checks = checksum(data)
         checks = bytes(f'{checks :< {LEN_CHECKSUM_HEADER}}', FORMAT)
 
         chunks.insert(0, size + chunk_index + data + checks)
 
         index += 1
-        bytes_rec += CHUNK
+        bytes_rec += chunk
     chunks.reverse()
 
     state = [0 for _ in chunks]
@@ -98,8 +98,8 @@ def increase_window(window_size):
         return window_size + 1
 
 
-def receive(cur_sock, addr) -> list:
-    get_size = CHUNK + LEN_SIZE_HEADER + LEN_INDEX_HEADER + LEN_CHECKSUM_HEADER
+def receive(cur_sock, addr, chunk=CHUNK) -> list:
+    get_size = chunk + LEN_SIZE_HEADER + LEN_INDEX_HEADER + LEN_CHECKSUM_HEADER
     max_seq_index = 0
     chunks = []
     indexes = []
@@ -109,7 +109,7 @@ def receive(cur_sock, addr) -> list:
     while True:
         msg = 0
         msg = cur_sock.recvfrom(get_size)[0]
-        print("msg:", msg , "len", len(msg))
+        print("msg:", msg, "len", len(msg))
         if len(msg) > 25:
             data = msg[LEN_SIZE_HEADER + LEN_INDEX_HEADER: -LEN_CHECKSUM_HEADER]
             if checksum(data) == int(msg[-LEN_CHECKSUM_HEADER:]):  # is the checksum correct
@@ -135,8 +135,8 @@ def receive(cur_sock, addr) -> list:
                                 key=lambda chunk_: int(chunk_[LEN_SIZE_HEADER:LEN_INDEX_HEADER + LEN_SIZE_HEADER]))
                 # combine chunks
                 full_msg = b''
-                for chunk in chunks:
-                    full_msg += chunk[LEN_SIZE_HEADER + LEN_INDEX_HEADER: -LEN_CHECKSUM_HEADER]
+                for ch in chunks:
+                    full_msg += ch[LEN_SIZE_HEADER + LEN_INDEX_HEADER: -LEN_CHECKSUM_HEADER]
                 full_msg = pickle.loads(full_msg)
                 print("full msg:", full_msg, end="\n\n")
                 return full_msg
