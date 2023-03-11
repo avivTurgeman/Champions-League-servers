@@ -639,51 +639,7 @@ def connect_to_socket():
         CLIENT = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
         CLIENT.bind((socket.gethostbyname(socket.gethostname()), CLIENT_PORT))  # binding the address
 
-        flag = 1
-        temp_pair = 0
         CLIENT.setblocking(False)
-
-        # while flag:
-        #     # sending start message (syn)
-        #     if flag == 1:
-        #         CLIENT.settimeout(0.2)
-        #         print(f'sending start message')
-        #         CLIENT.sendto(pickle.dumps(CHUNK), SERVER_ADDR)
-        #         flag = 2
-        #
-        #     # recv start massage and change the address
-        #     if flag == 2:
-        #         CLIENT.settimeout(0.2)
-        #         temp_pair = 0
-        #         try:
-        #             if temp_pair == 0:
-        #                 temp_pair = CLIENT.recvfrom(100)
-        #         except socket.timeout as e:
-        #             pass
-        #         if temp_pair != 0:
-        #             flag = 3
-        #             SERVER_ADDR = temp_pair[1]
-        #             print("!=0 case, temp pair:", temp_pair, ".")
-        #         else:
-        #             print(" ==0 case, temp pair:", temp_pair, ".")
-        #             flag = 1
-        #     # ack
-        #     if flag == 3:
-        #         CLIENT.sendto(pickle.dumps("ack"), SERVER_ADDR)
-        #         print("sent ack")
-        #         msg2 = 0
-        #         try:
-        #             CLIENT.settimeout(2)
-        #             msg2 = CLIENT.recvfrom(1000)[0]
-        #         except socket.timeout as e:
-        #             msg2 = 0
-        #
-        #         if msg2 == 0:
-        #             flag = 0
-        #         else:  # if I got somthing that's mean the server still trying to complete the sync
-        #             flag = 1
-
-
         CLIENT.settimeout(0.9)
         print(f'sending start message')
         trying1 = True
@@ -707,8 +663,8 @@ def connect_to_socket():
             except socket.timeout as e:
                 trying2 = False
 
-        CLIENT.setblocking(True)
         CLIENT.settimeout(30.0)
+        CLIENT.setblocking(True)
         print("RUDP connection established")
 
 

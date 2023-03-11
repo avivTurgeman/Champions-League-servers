@@ -35,38 +35,7 @@ def handle_client(ip, port, chunk):
     # free the port right after disconnecting
     current_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     current_sock.bind(current_addr)
-    current_sock.setblocking(False)
 
-    # sending the message for the client to know the new port
-    # while flag:
-    #     if flag == 1:
-    #         current_sock.settimeout(0.3)
-    #         # syn ack
-    #         print("sending SYN-ACK")
-    #         start_msg = pickle.dumps("ack")
-    #         current_sock.sendto(start_msg, addr)
-    #         flag = 2
-    #
-    #     if flag == 2:
-    #         msg = 0
-    #         try:
-    #             current_sock.settimeout(0.18)
-    #             if msg == 0:
-    #                 msg = current_sock.recvfrom(100)
-    #         except socket.error as e:
-    #             print(e)
-    #
-    #         if msg != 0:
-    #             msg = pickle.loads(msg[0])
-    #             print("msg:", msg, "len", len(msg))
-    #             if msg == "ack":
-    #                 print(f'connection with {addr} established')
-    #                 flag = 0
-    #                 break
-    #             else:
-    #                 flag = 1
-    #         else:
-    #             flag = 1
     current_sock.setblocking(False)
     current_sock.settimeout(1)
     # syn ack
@@ -82,8 +51,8 @@ def handle_client(ip, port, chunk):
         except socket.timeout as e:
             trying = True
 
-    current_sock.setblocking(True)
     current_sock.settimeout(30.0)
+    current_sock.setblocking(True)
 
     while True:
         full_msg = functions.receive(current_sock, addr, chunk)
