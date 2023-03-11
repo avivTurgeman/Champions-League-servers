@@ -10,7 +10,7 @@ PORT = 30015
 SERVER_IP = socket.gethostbyname(socket.gethostname())  # getting the ip of the computer
 ADDR = (SERVER_IP, PORT)
 FORMAT = 'utf-8'  # the format that the messages decode/encode
-CHUNK = 32
+CHUNK = 16
 PORT_CHANGE = 1
 clients = []
 
@@ -38,35 +38,50 @@ def handle_client(ip, port, chunk):
     current_sock.setblocking(False)
 
     # sending the message for the client to know the new port
-    while flag:
-        if flag == 1:
-            current_sock.settimeout(0.3)
-            # syn ack
-            print("sending SYN-ACK")
-            start_msg = pickle.dumps("ack")
-            current_sock.sendto(start_msg, addr)
-            flag = 2
+    # while flag:
+    #     if flag == 1:
+    #         current_sock.settimeout(0.3)
+    #         # syn ack
+    #         print("sending SYN-ACK")
+    #         start_msg = pickle.dumps("ack")
+    #         current_sock.sendto(start_msg, addr)
+    #         flag = 2
+    #
+    #     if flag == 2:
+    #         msg = 0
+    #         try:
+    #             current_sock.settimeout(0.18)
+    #             if msg == 0:
+    #                 msg = current_sock.recvfrom(100)
+    #         except socket.error as e:
+    #             print(e)
+    #
+    #         if msg != 0:
+    #             msg = pickle.loads(msg[0])
+    #             print("msg:", msg, "len", len(msg))
+    #             if msg == "ack":
+    #                 print(f'connection with {addr} established')
+    #                 flag = 0
+    #                 break
+    #             else:
+    #                 flag = 1
+    #         else:
+    #             flag = 1
+    current_sock.setblocking(False)
+    current_sock.settimeout(1)
+    # syn ack
+    print("sending SYN-ACK")
+    start_msg = pickle.dumps("ack")
+    trying = True
+    while trying:
+        current_sock.sendto(start_msg, addr)
+        try:
+            msg = current_sock.recvfrom(100)
+            if pickle.loads(msg[0]) == "ack":
+                trying = False
+        except socket.timeout as e:
+            trying = True
 
-        if flag == 2:
-            msg = 0
-            try:
-                current_sock.settimeout(0.18)
-                if msg == 0:
-                    msg = current_sock.recvfrom(100)
-            except socket.error as e:
-                print(e)
-
-            if msg != 0:
-                msg = pickle.loads(msg[0])
-                print("msg:", msg, "len", len(msg))
-                if msg == "ack":
-                    print(f'connection with {addr} established')
-                    flag = 0
-                    break
-                else:
-                    flag = 1
-            else:
-                flag = 1
     current_sock.setblocking(True)
     current_sock.settimeout(30.0)
 

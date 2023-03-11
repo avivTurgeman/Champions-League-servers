@@ -87,7 +87,6 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
                         window_size = 1
                         state[k] = 0
 
-
         if state[-1] == 2:
             cur_sock.setblocking(True)
             break
