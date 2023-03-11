@@ -15,7 +15,7 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
     window_size = 1
     window_index = 0
     time_limit = 5
-    dup_limit = 250
+    dup_limit = 3
     # turning the socket to non-blocking
     cur_sock.setblocking(False)
 
@@ -85,6 +85,8 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
                     if time.time() - timestemps[k] >= time_limit:  # TIMEOUT!
                         print("TIMEOUT!")  # todo: check time out!
                         window_size = 1
+                        state[k] = 0
+
 
         if state[-1] == 2:
             cur_sock.setblocking(True)
