@@ -34,6 +34,7 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
         index += 1
         bytes_rec += chunk
     chunks.reverse()
+    print("number of packets to send is:", len(chunks))
 
     state = [0 for _ in chunks]
     timestemps = [0.0 for _ in chunks]
@@ -83,7 +84,7 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
             if k < len(state):
                 if state[k] == 1:
                     if time.time() - timestemps[k] >= time_limit:  # TIMEOUT!
-                        print("TIMEOUT!")  # todo: check time out!
+                        print("TIMEOUT!")
                         window_size = 1
                         state[k] = 0
 
@@ -111,7 +112,7 @@ def receive(cur_sock, addr, chunk=CHUNK) -> list:
         msg = 0
         msg = cur_sock.recvfrom(get_size)[0]
         print("msg:", msg, "len", len(msg))
-        if len(msg) > 25:
+        if len(msg) >= 25:
             data = msg[LEN_SIZE_HEADER + LEN_INDEX_HEADER: -LEN_CHECKSUM_HEADER]
             if checksum(data) == int(msg[-LEN_CHECKSUM_HEADER:]):  # is the checksum correct
                 msg_len = int(msg[:LEN_SIZE_HEADER])

@@ -320,12 +320,6 @@ class query_button(button):
         if self.visible:
             cur = pygame.mouse.get_pos()
             if (self.x <= cur[0] <= self.x + self.width) and (self.y <= cur[1] <= self.y + self.height):
-                # hover text:
-                # text = "lncakjkasbcksabcskb"
-                # text = small_font.render(text, True, gray)
-                # rect = text.get_rect()
-                # rect.center = (self.x + self.width/2 , self.y + self.height + 10)
-                # self.screen.blit(text, rect.topleft)
                 if pygame.mouse.get_pressed()[0] == 1:
                     if not self.clicked:
                         self.click()
