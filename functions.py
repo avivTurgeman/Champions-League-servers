@@ -14,7 +14,7 @@ def send_with_cc(cur_sock, addr, msg, chunk=CHUNK):
     msg = pickle.dumps(msg)
     window_size = 1
     window_index = 0
-    time_limit = 5
+    time_limit = 8
     dup_limit = 3
     # turning the socket to non-blocking
     cur_sock.setblocking(False)

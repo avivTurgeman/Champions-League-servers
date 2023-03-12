@@ -42,9 +42,9 @@ icon = pygame.image.load('sql_icon.png')
 pygame.display.set_icon(icon)
 
 # sound
-# mixer.music.set_volume(0.3)
-# mixer.music.load('background_Sound.mp3')
-# mixer.music.play(-1, fade_ms=5000)
+mixer.music.set_volume(0.2)
+mixer.music.load('background_Sound.mp3')
+mixer.music.play(-1, fade_ms=5000)
 click_sound = pygame.mixer.Sound("Mouse_Click_2-fesliyanstudios.com.mp3")
 
 fps = 30
